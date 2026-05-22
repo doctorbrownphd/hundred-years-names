@@ -151,6 +151,15 @@ function TabSearch({ accent }) {
       .slice(0, 5);
   }, [found]);
 
+  // Your Generation — names that peaked within ±3 years
+  const generation = React.useMemo(() => {
+    if (!found) return [];
+    return _ND
+      .filter(n => n.name !== found.name && Math.abs(n.peakYear - found.peakYear) <= 3)
+      .sort((a, b) => b.peakRate - a.peakRate)
+      .slice(0, 5);
+  }, [found]);
+
   const stronghold = React.useMemo(() => {
     if (!found) return null;
     const map = {
@@ -281,6 +290,33 @@ function TabSearch({ accent }) {
                 a {found.peakRate > 0 ? Math.round((1 - found.currentRate/found.peakRate)*100) : 0}% decline from peak.
                 Belongs to <em>{eraLabel(found.era)}</em> alongside {related.slice(0,3).map(r => r.name).join(", ")}.
               </p>
+
+              {/* Your Generation */}
+              {generation.length > 0 && (
+                <div style={{marginTop:28, padding:"20px 24px", background:"var(--panel)", borderRadius:6, border:"1px solid var(--rule)"}}>
+                  <div style={{fontFamily:"var(--mono)", fontSize:10, letterSpacing:"0.16em", textTransform:"uppercase", color:"var(--muted)", marginBottom:4}}>
+                    Your Generation · Born around {found.peakYear}
+                  </div>
+                  <div style={{fontFamily:"var(--serif)", fontStyle:"italic", fontSize:14, color:"var(--vellum-dim)", marginBottom:14, lineHeight:1.5}}>
+                    If you were born in {found.peakYear}, the other kids in your class were probably:
+                  </div>
+                  <div style={{display:"flex", flexWrap:"wrap", gap:8}}>
+                    {generation.map(g => (
+                      <span key={g.name} onClick={() => setQuery(g.name)}
+                        style={{
+                          fontFamily:"var(--serif)", fontSize:14, fontWeight:500, color:"var(--ink)",
+                          background:"var(--bg)", border:"1px solid var(--rule)", borderRadius:20,
+                          padding:"5px 14px", cursor:"pointer", transition:"border-color 200ms",
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.borderColor = accent}
+                        onMouseLeave={e => e.currentTarget.style.borderColor = "var(--rule)"}
+                      >
+                        {g.name} <span style={{fontFamily:"var(--mono)", fontSize:10, color:"var(--muted)", marginLeft:4}}>peak {g.peakYear}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -360,6 +396,56 @@ function TabWaves({ accent }) {
                       <Sparkline data={s.yearly} width={200} height={14} color={accent} peak={false} />
                     </div>
                   ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Name Killers ── */}
+      <div className="section">
+        <div className="section-head">
+          <div className="label">§ II.b · Name Killers</div>
+          <div className="rule" />
+          <div className="aside">Names destroyed by brands, disasters, and memes</div>
+        </div>
+        <h2 className="section-title">Some names don't fade. They're killed.</h2>
+        <p className="section-lede">
+          A brand launch, a hurricane, a meme — one event severs a name from its trajectory.
+          The decline isn't gradual. It's a cliff.
+        </p>
+
+        <div style={{display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:0, background:"var(--panel)", borderRadius:6, boxShadow:"0 1px 4px rgba(27,42,74,0.06), 0 0 0 1px rgba(213,207,195,0.5)"}}>
+          {[
+            { key:"alexa_F",    event:"Amazon Echo",      eventYear:2014 },
+            { key:"katrina_F",  event:"Hurricane Katrina", eventYear:2005 },
+            { key:"isis_F",     event:"ISIS / ISIL",       eventYear:2014 },
+            { key:"karen_F",    event:"The meme cycle",    eventYear:2018 },
+            { key:"donald_M",   event:"2016 campaign",     eventYear:2015 },
+          ].map((k, i) => {
+            const n = _NI[k.key];
+            if (!n) return null;
+            const decline = ((n.currentRate - n.peakRate) / n.peakRate * 100).toFixed(0);
+            return (
+              <div key={k.key} style={{
+                padding:"20px 18px 22px",
+                borderRight: i < 4 ? "1px solid var(--rule)" : "none",
+              }}>
+                <div style={{fontFamily:"var(--display)", fontSize:32, fontWeight:600, letterSpacing:"-0.02em", color:"var(--ink)", marginBottom:4}}>{n.name}</div>
+                <div style={{fontFamily:"var(--mono)", fontSize:10, letterSpacing:"0.12em", textTransform:"uppercase", color:"var(--muted)", marginBottom:10}}>
+                  {k.event} · {k.eventYear}
+                </div>
+                <Sparkline data={synthYearly(n)} width={160} height={36} color={accent} fill peak={false} />
+                <div style={{marginTop:10, display:"flex", justifyContent:"space-between", alignItems:"baseline"}}>
+                  <div style={{fontFamily:"var(--mono)", fontSize:11, color:"var(--vellum-dim)"}}>
+                    {n.peakRate.toFixed(1)}<span style={{fontSize:9, color:"var(--muted)"}}>/1k</span>
+                    <span style={{margin:"0 4px", color:"var(--rule)"}}>→</span>
+                    {n.currentRate.toFixed(1)}<span style={{fontSize:9, color:"var(--muted)"}}>/1k</span>
+                  </div>
+                  <div style={{fontFamily:"var(--mono)", fontSize:13, fontWeight:600, color:"#B44", letterSpacing:"-0.01em"}}>
+                    {decline}%
+                  </div>
                 </div>
               </div>
             );
@@ -692,6 +778,89 @@ function TabArchetypes({ accent }) {
                 <div style={{fontFamily:"var(--serif)", fontStyle:"italic", fontSize:"13.5px", color:"var(--muted)", marginTop:10}}>
                   {a.top.join(" · ")}
                 </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Phonetic Contagion ── */}
+      <div className="section">
+        <div className="section-head">
+          <div className="label">§ V.b · Phonetic Contagion</div>
+          <div className="rule" />
+          <div className="aside">Suffix cascades · timeline</div>
+        </div>
+        <h2 className="section-title">A suffix catches, then spreads.</h2>
+        <p className="section-lede">
+          One name invents a sound. Within a decade, a dozen variants exhaust it.
+          The suffix becomes a generation marker — then a cliche — then silence.
+        </p>
+
+        <div style={{display:"grid", gap:28}}>
+          {[
+            { suffix:"-aiden", names:[
+              {name:"Aiden",   key:"aiden_M",   fallback:2003},
+              {name:"Jayden",  key:"jayden_M",  fallback:2007},
+              {name:"Brayden", key:"brayden_M", fallback:2008},
+              {name:"Hayden",  key:"hayden_M",  fallback:2006},
+              {name:"Kayden",  key:"kayden_M",  fallback:2010},
+            ]},
+            { suffix:"-lyn / -lynn", names:[
+              {name:"Brooklyn",key:"brooklyn_F", fallback:2006},
+              {name:"Jocelyn", key:"jocelyn_F",  fallback:2007},
+              {name:"Raelynn", key:"raelynn_F",  fallback:2012},
+              {name:"Adalynn", key:"adalynn_F",  fallback:2013},
+            ]},
+            { suffix:"-ella", names:[
+              {name:"Isabella",key:"isabella_F", fallback:2009},
+              {name:"Gabriella",key:"gabriella_F",fallback:2008},
+              {name:"Arabella",key:"arabella_F", fallback:2014},
+              {name:"Estrella",key:"estrella_F", fallback:2012},
+            ]},
+          ].map(group => {
+            const resolved = group.names.map(g => {
+              const n = _NI[g.key];
+              return { ...g, peakYear: n ? n.peakYear : g.fallback, peakRate: n ? n.peakRate : 1, data: n };
+            }).sort((a, b) => a.peakYear - b.peakYear);
+            const minY = Math.min(...resolved.map(r => r.peakYear));
+            const maxY = Math.max(...resolved.map(r => r.peakYear));
+            const W = 700, padL = 40, padR = 40, H = 100;
+            const innerW = W - padL - padR;
+            const xScale = maxY > minY ? (yr) => padL + ((yr - minY) / (maxY - minY)) * innerW : () => W/2;
+            return (
+              <div key={group.suffix} style={{background:"var(--panel)", borderRadius:6, padding:"20px 24px 24px", border:"1px solid var(--rule)"}}>
+                <div style={{display:"flex", alignItems:"baseline", gap:14, marginBottom:14}}>
+                  <div style={{fontFamily:"var(--display)", fontSize:28, fontWeight:600, letterSpacing:"-0.02em", color:"var(--ink)"}}>{group.suffix}</div>
+                  <div style={{fontFamily:"var(--mono)", fontSize:10, letterSpacing:"0.12em", textTransform:"uppercase", color:"var(--muted)"}}>
+                    {minY}–{maxY} · {resolved.length} names
+                  </div>
+                </div>
+                <svg width={W} height={H} style={{display:"block", overflow:"visible"}}>
+                  {/* Connecting line */}
+                  <line x1={xScale(resolved[0].peakYear)} y1={50}
+                        x2={xScale(resolved[resolved.length-1].peakYear)} y2={50}
+                        stroke="var(--rule)" strokeWidth={2} />
+                  {/* Year axis ticks */}
+                  {resolved.map((r, i) => {
+                    const x = xScale(r.peakYear);
+                    const above = i % 2 === 0;
+                    return (
+                      <g key={r.name}>
+                        <circle cx={x} cy={50} r={Math.max(4, Math.min(10, r.peakRate * 1.8))}
+                                fill={accent} opacity={0.85} />
+                        <text x={x} y={above ? 22 : 82} textAnchor="middle"
+                              fontFamily="var(--serif)" fontStyle="italic" fontSize="13" fill="var(--ink)">
+                          {r.name}
+                        </text>
+                        <text x={x} y={above ? 12 : 96} textAnchor="middle"
+                              fontFamily="var(--mono)" fontSize="9" fill="var(--muted)" letterSpacing="0.08em">
+                          {r.peakYear}
+                        </text>
+                      </g>
+                    );
+                  })}
+                </svg>
               </div>
             );
           })}
