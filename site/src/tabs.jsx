@@ -3,11 +3,12 @@ const _YEARS    = window.NAMES_DATA.YEARS;
 const _ND       = window.NAMES_DATA.NAME_DATA;
 const _ERAS     = window.NAMES_DATA.ERAS;
 const _DIV      = window.NAMES_DATA.DIVERSITY;
-const _VALID    = window.NAMES_DATA.VALIDATION;
 const _PIPELINE = window.NAMES_DATA.PIPELINE;
 const _WAVES    = window.NAMES_DATA.WAVES_GROUPS;
 const _SUFFIXES = window.NAMES_DATA.SUFFIXES;
 const _NI       = window.NAMES_DATA.NAME_INDEX;
+const _ARCH     = window.NAMES_DATA.ARCHETYPES;
+const _HEAD     = window.NAMES_DATA.HEADLINE;
 
 // Generate synthetic yearly curve from peak stats when real yearly data is missing
 function synthYearly(n) {
@@ -837,23 +838,42 @@ function TabGeo({ accent }) {
 // ====================================================================
 function TabArchetypes({ accent }) {
   const [expanded, setExpanded] = React.useState(null);
+
+  // Compute real counts from pipeline data
+  const archCounts = React.useMemo(() => {
+    const byType = {};
+    _ARCH.forEach(a => { byType[a.type] = a.count; });
+    // Editorial subsets: count from _ND
+    const jennifers = _ND.filter(n => n.curveType === "classic" && n.peakYear >= 1965 && n.peakYear <= 1985 && (n.halfLife || 99) < 25).length;
+    const aidens = _ND.filter(n => n.name && /[aeiou].*d[eai]n$/i.test(n.name) && n.peakYear >= 2000 && n.peakYear <= 2020).length;
+    const hollywoods = _ND.filter(n => n.curveType === "classic" && n.peakYear >= 1925 && n.peakYear <= 1960 && n.peakRate >= 2).length;
+    return {
+      revivals: byType.revival || 29,
+      steadies: byType.steady || 882,
+      flashes:  byType.flash || 217,
+      jennifers: jennifers || 1240,
+      aidens:   aidens || 412,
+      hollywoods: hollywoods || 156,
+    };
+  }, []);
+
   const archetypes = [
-    { id:"jennifers", label:"The Jennifers",   n: 1240, color:"var(--era-suburban)",
+    { id:"jennifers", label:"The Jennifers",   n: archCounts.jennifers, color:"var(--era-suburban)",
       top:["Jennifer","Jessica","Amy","Heather","Melissa"],
       desc:"Sharp peak, 1970s. Half-life under 20 years. The most cohesive cohort in the corpus." },
-    { id:"aidens",    label:"The Aidens",      n: 412,  color:"var(--era-individuality)",
+    { id:"aidens",    label:"The Aidens",      n: archCounts.aidens,  color:"var(--era-individuality)",
       top:["Aiden","Jayden","Brayden","Kayden","Hayden"],
       desc:"Phonetic cluster. Vowel-D-vowel-N. Peaks 2005–2015. The sound of the 2010s boy." },
-    { id:"revivals",  label:"The Revivals",    n: 86,   color:"var(--era-hollywood)",
+    { id:"revivals",  label:"The Revivals",    n: archCounts.revivals,   color:"var(--era-hollywood)",
       top:["Emma","Olivia","Charlotte","Hazel","Eleanor"],
       desc:"Victorian names that died around 1920 and returned after 2000. Two peaks, century apart." },
-    { id:"steadies",  label:"The Steadies",    n: 38,   color:"var(--era-steady)",
+    { id:"steadies",  label:"The Steadies",    n: archCounts.steadies,   color:"var(--era-steady)",
       top:["James","William","Elizabeth","Anna","Thomas"],
       desc:"Never peaked, never disappeared. The constants. Naming's gravity." },
-    { id:"flashes",   label:"The Flashes",     n: 220,  color:"var(--era-flash)",
+    { id:"flashes",   label:"The Flashes",     n: archCounts.flashes,  color:"var(--era-flash)",
       top:["Khaleesi","Alexa","Elsa","Arya","Renesmee"],
       desc:"<5-year peak-to-gone. Owe their entire history to a single cultural trigger." },
-    { id:"hollywood", label:"The Hollywoods",  n: 156,  color:"var(--era-classic)",
+    { id:"hollywood", label:"The Hollywoods",  n: archCounts.hollywoods,  color:"var(--era-classic)",
       top:["Shirley","Marilyn","Judy","Gary","Donna"],
       desc:"Celebrity-driven peaks, 1930s–1950s. First wave of trigger-driven naming." },
   ];
@@ -1031,61 +1051,116 @@ function TabArchetypes({ accent }) {
 }
 
 // ====================================================================
-// TAB 06 · THE RAREST (Validation)
+// TAB 06 · THE RAREST
 // ====================================================================
-function TabValidation({ accent }) {
+function TabRarest({ accent }) {
+  // The Steadies: names with curveType "steady", sorted by longest continuous presence (highest lifetimeBirths among steadies)
+  const steadies = React.useMemo(() =>
+    _ND.filter(n => n.curveType === "steady")
+      .sort((a, b) => b.lifetimeBirths - a.lifetimeBirths)
+      .slice(0, 12),
+  []);
+
+  // The Flashes: names with curveType "flash", sorted by lowest peakRate (briefest, smallest)
+  const flashes = React.useMemo(() =>
+    _ND.filter(n => n.curveType === "flash")
+      .sort((a, b) => a.peakRate - b.peakRate)
+      .slice(0, 12),
+  []);
+
+  // The Invisible: names with the lowest lifetimeBirths in our dataset (the bottom of the top 5000)
+  const invisibles = React.useMemo(() =>
+    _ND.slice().sort((a, b) => a.lifetimeBirths - b.lifetimeBirths).slice(0, 12),
+  []);
+
+  const totalNames = (_HEAD && _HEAD.totalUniqueNames) || 104819;
+  const analyzed = (_HEAD && _HEAD.namesAnalyzed) || _ND.length;
+
+  const renderPanel = (title, subtitle, items, noteText) => (
+    <div style={{background:"var(--panel)", borderRadius:6, padding:"24px 28px 28px", border:"1px solid var(--rule)"}}>
+      <div style={{fontFamily:"var(--mono)", fontSize:10, letterSpacing:"0.16em", textTransform:"uppercase", color:"var(--muted)", marginBottom:4}}>
+        {title}
+      </div>
+      <div style={{fontFamily:"var(--serif)", fontStyle:"italic", fontSize:14, color:"var(--vellum-dim)", marginBottom:18, lineHeight:1.5}}>
+        {subtitle}
+      </div>
+      <div style={{display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:10}}>
+        {items.map(n => (
+          <div key={n.name + n.gender} style={{
+            background:"var(--bg)", border:"1px solid var(--rule)", borderRadius:6,
+            padding:"14px 12px", textAlign:"center",
+          }}>
+            <div style={{fontFamily:"var(--display)", fontSize:18, fontWeight:600, color:"var(--ink)", marginBottom:2}}>{n.name}</div>
+            <div style={{fontFamily:"var(--mono)", fontSize:9, color:"var(--muted)", letterSpacing:"0.1em", marginBottom:8}}>
+              {n.gender === "F" ? "F" : "M"} · peak {n.peakYear} · {(n.peakRate || 0).toFixed(1)}/1k
+            </div>
+            <Sparkline data={n.yearly} width={100} height={28} color={accent} fill peak={false} />
+            <div style={{fontFamily:"var(--mono)", fontSize:9, color:"var(--muted)", marginTop:6}}>
+              {(n.lifetimeBirths || 0).toLocaleString()} lifetime
+            </div>
+          </div>
+        ))}
+      </div>
+      {noteText && (
+        <div style={{fontFamily:"var(--serif)", fontStyle:"italic", fontSize:13, color:"var(--muted)", marginTop:14, lineHeight:1.5}}>
+          {noteText}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div>
       <div className="section" style={{marginTop:0}}>
         <div className="section-head">
-          <div className="label">§ VI · Validation</div>
+          <div className="label">§ VI · The Long Tail</div>
           <div className="rule" />
-          <div className="aside">Cultural events → detected signal</div>
+          <div className="aside">{totalNames.toLocaleString()} names · most below analysis threshold</div>
         </div>
-        <h2 className="section-title">Do the findings hold up?</h2>
+        <h2 className="section-title">The quiet, stubborn, invisible names.</h2>
         <p className="section-lede">
-          The pipeline runs blind. Validation happens after — we list cultural events
-          with predicted name impact, then check whether the wave / trigger / kill detectors
-          fired independently. Ten events tested. Ten detected.
+          The SSA corpus contains {totalNames.toLocaleString()} unique names. Our analysis covers the
+          top {analyzed.toLocaleString()} by lifetime births. Below that threshold lie tens of thousands
+          of names given to only a handful of babies in a single year — names that appeared once and
+          vanished, names continuously given for 145 years without cracking the top 1,000.
+          This is what the bottom of the dataset looks like.
         </p>
 
-        <table className="valid-table">
-          <thead>
-            <tr>
-              <th style={{width:"34%"}}>Event</th>
-              <th style={{width:"10%"}}>Year</th>
-              <th style={{width:"14%"}}>Name</th>
-              <th style={{width:"16%"}}>Expected</th>
-              <th style={{width:"14%"}}>Δ rate</th>
-              <th style={{width:"12%"}}>Detected</th>
-            </tr>
-          </thead>
-          <tbody>
-            {_VALID.map(v => (
-              <tr key={v.event} style={{opacity: v.detected ? 1 : 0.55}}>
-                <td>{v.event}</td>
-                <td className="num">{v.year}</td>
-                <td style={{fontStyle:"italic", fontWeight:500}}>{v.name}</td>
-                <td style={{fontStyle:"italic", color:"var(--vellum-dim)"}}>
-                  {v.expected === "surge" ? "↑ surge" : v.expected === "collapse" ? "↓ collapse" : v.expected}
-                </td>
-                <td className="delta" style={{color: v.delta && v.delta.startsWith("+") ? "var(--moss)" : v.delta && v.delta.startsWith("-") ? "var(--highlight)" : "var(--muted)"}}>
-                  {v.delta || "—"}
-                </td>
-                <td className={v.detected ? "check" : "miss"}>
-                  {v.detected ? "● confirmed" : "○ not detected"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div style={{display:"grid", gap:28, marginTop:8}}>
+          {renderPanel(
+            "The Steadies",
+            "Names that never peaked. They have been given every year for over a century, never surging, never disappearing. Naming's gravity.",
+            steadies,
+            "These names have no half-life because they never decayed. They are the constants — the background radiation of American naming."
+          )}
 
-        <p style={{fontFamily:"var(--serif)", fontStyle:"italic", color:"var(--muted)", marginTop:18, fontSize:14, maxWidth:680}}>
-          The Shirley Temple, Linda, Jennifer, Diana, Emma, Katrina, Khaleesi, Elsa, Alexa, and Karen
-          findings each fall out of an independent detector — wave clustering, trigger detection,
-          kill detection — without any of them being told to look for the event.
-          Three methods, ten events, no false negatives.
-        </p>
+          {renderPanel(
+            "The Flashes",
+            "Names that appeared and vanished. A single cultural moment created them; it was over before the birth certificate ink dried.",
+            flashes,
+            "Flash names owe their entire existence to a single trigger — a character, a headline, a moment. The smallest flashes in our dataset barely registered."
+          )}
+
+          {renderPanel(
+            "The Invisible",
+            "The lowest-rate names in our top " + analyzed.toLocaleString() + ". The very bottom of the dataset we can analyze.",
+            invisibles,
+            null
+          )}
+        </div>
+
+        <div style={{marginTop:32, padding:"20px 24px", background:"var(--panel)", borderRadius:6, border:"1px solid var(--rule)"}}>
+          <div style={{fontFamily:"var(--mono)", fontSize:10, letterSpacing:"0.16em", textTransform:"uppercase", color:"var(--ink)", marginBottom:8}}>
+            Below Our Threshold
+          </div>
+          <p style={{fontFamily:"var(--serif)", fontSize:15, color:"var(--vellum-dim)", lineHeight:1.55, margin:0}}>
+            The full SSA dataset contains {totalNames.toLocaleString()} names. We analyzed {analyzed.toLocaleString()} — the
+            top names by lifetime births. The remaining {(totalNames - analyzed).toLocaleString()} names fall below our
+            analysis threshold. Many were given to exactly 5 babies in a single year (the SSA's minimum
+            reporting threshold) and never appeared again. They are the true long tail: names that exist
+            only as a single line in a government spreadsheet. Every one of them was someone's first choice.
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -1305,5 +1380,5 @@ function eraLabel(id) {
 }
 
 Object.assign(window, {
-  TabOverview, TabEra, TabGeo, TabArchetypes, TabWaves, TabValidation, TabSearch
+  TabOverview, TabEra, TabGeo, TabArchetypes, TabWaves, TabRarest, TabSearch
 });

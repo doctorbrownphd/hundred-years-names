@@ -191,7 +191,7 @@ function App() {
         {active === "era"        && <TabEra accent={palette.accent} />}
         {active === "geo"        && <TabGeo accent={palette.accent} />}
         {active === "archetypes" && <TabArchetypes accent={palette.accent} />}
-        {active === "validation" && <TabValidation accent={palette.accent} />}
+        {active === "validation" && <TabRarest accent={palette.accent} />}
         {active === "overview"   && <TabOverview accent={palette.accent} />}
       </main>
 
