@@ -265,7 +265,7 @@ function TabWaves({ accent }) {
 
         <div className="waves-list">
           {_WAVES.map(w => {
-            const samples = w.names.map(nm => _NI[nm.toLowerCase()]).filter(Boolean);
+            const samples = w.names.map(nm => _NI[nm.toLowerCase()] || _NI[nm.toLowerCase()+"_f"] || _NI[nm.toLowerCase()+"_m"]).filter(Boolean);
             return (
               <div className="wave-card" key={w.id}>
                 <div className="yr">
@@ -306,7 +306,8 @@ function TabEra({ accent }) {
     .filter(n => !eraFilter || n.era === eraFilter)
     .slice(0, 60);
 
-  const sel = _NI[selected.toLowerCase()];
+  const _q = selected.toLowerCase();
+  const sel = _NI[_q] || _NI[_q+"_f"] || _NI[_q+"_m"];
 
   return (
     <div>
@@ -343,8 +344,8 @@ function TabEra({ accent }) {
             </div>
           </div>
 
-          <aside className="detail">
-            <div className="meta">SELECTED \u00b7 {sel.era.toUpperCase()}</div>
+          {sel && <aside className="detail">
+            <div className="meta">SELECTED · {(sel.era||"").toUpperCase()}</div>
             <h3>{sel.name}</h3>
             <p style={{fontFamily:"var(--serif)", fontStyle:"italic", color:"var(--vellum-dim)"}}>
               {curveTypeLabel(sel)}
@@ -352,12 +353,12 @@ function TabEra({ accent }) {
             <Sparkline data={sel.yearly} width={240} height={56} color={accent} fill peak />
             <div className="stats">
               <div><div className="k">Peak year</div><div className="v">{sel.peakYear}</div></div>
-              <div><div className="k">Peak rate</div><div className="v">{sel.peakRate.toFixed(2)}<span style={{fontFamily:"var(--mono)",fontSize:"10px",color:"var(--muted)",marginLeft:4}}>/1k</span></div></div>
+              <div><div className="k">Peak rate</div><div className="v">{(sel.peakRate||0).toFixed(2)}<span style={{fontFamily:"var(--mono)",fontSize:"10px",color:"var(--muted)",marginLeft:4}}>/1k</span></div></div>
               <div><div className="k">Rise time</div><div className="v">{sel.riseTime ?? "\u2014"}<span style={{fontFamily:"var(--mono)",fontSize:"10px",color:"var(--muted)",marginLeft:4}}>yr</span></div></div>
               <div><div className="k">Half-life</div><div className="v">{sel.halfLife ?? "\u2014"}<span style={{fontFamily:"var(--mono)",fontSize:"10px",color:"var(--muted)",marginLeft:4}}>yr</span></div></div>
             </div>
             <p>{narrate(sel)}</p>
-          </aside>
+          </aside>}
         </div>
       </div>
 
@@ -556,7 +557,7 @@ function TabArchetypes({ accent }) {
 
         <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:0, background:"var(--panel)", borderRadius:6, boxShadow:"0 1px 4px rgba(27,42,74,0.06), 0 0 0 1px rgba(213,207,195,0.5)"}}>
           {archetypes.map((a, i) => {
-            const sample = _NI[a.top[0].toLowerCase()] || _ND[0];
+            const sample = _NI[a.top[0].toLowerCase()] || _NI[a.top[0].toLowerCase()+"_f"] || _NI[a.top[0].toLowerCase()+"_m"] || _ND[0];
             const col = i % 3, row = Math.floor(i / 3);
             return (
               <div key={a.id} style={{
@@ -776,7 +777,7 @@ function TabOverview({ accent }) {
             { tag: "The Trigger",   name: "Khaleesi",  by: "first recorded in 2011 \u00b7 Game of Thrones",
               nums: [["debut","2011"],["peak","2013"],["born","\u223c560"]] },
           ].map((f, i) => {
-            const n = _NI[f.name.toLowerCase()];
+            const n = _NI[f.name.toLowerCase()] || _NI[f.name.toLowerCase()+"_f"] || _NI[f.name.toLowerCase()+"_m"];
             return (
               <div className="feat" key={i}>
                 <div className="tag">{f.tag}</div>
