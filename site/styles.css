@@ -36,6 +36,56 @@
   --mono:     "Space Mono", ui-monospace, "SF Mono", Menlo, monospace;
 }
 
+/* Dark theme for Names */
+[data-theme="dark"] {
+  --ink:        #C8D0DC;
+  --ink-2:      #1A1F2E;
+  --ink-3:      #242838;
+  --rule:       #2E3344;
+  --vellum:     #E0E4EC;
+  --vellum-dim: #8898AA;
+  --muted:      #5E6E80;
+  --muted-2:    #3E4E60;
+  --amber:      #C8D0DC;
+  --amber-2:    #A0B0C8;
+  --highlight:  #D4A090;
+
+  --bg:         #0E1118;
+  --panel:      #161A24;
+
+  --era-classic:       #6878A0;
+  --era-hollywood:     #A07060;
+  --era-suburban:      #608870;
+  --era-individuality: #7868A0;
+  --era-unique:        #487888;
+  --era-flash:         #A05060;
+  --era-killed:        #607080;
+  --era-steady:        #788090;
+}
+[data-theme="dark"] body {
+  background: var(--bg);
+  color: var(--vellum);
+}
+[data-theme="dark"] body::before {
+  background-image: radial-gradient(rgba(200,208,220,0.02) 1px, transparent 1px);
+}
+[data-theme="dark"] .masthead h1 { color: var(--vellum); }
+[data-theme="dark"] .masthead h1 em { color: var(--highlight); }
+[data-theme="dark"] .masthead .series { color: var(--highlight); }
+[data-theme="dark"] .masthead .sub { color: var(--vellum-dim); }
+[data-theme="dark"] .tab.active { border-bottom-color: var(--highlight); color: var(--vellum); }
+[data-theme="dark"] .search-input {
+  color: var(--vellum);
+  border-bottom-color: var(--rule);
+}
+[data-theme="dark"] .search-input::placeholder { color: var(--muted); }
+[data-theme="dark"] .yourname-card {
+  background: var(--panel);
+  border-color: var(--rule);
+}
+[data-theme="dark"] .section-title { color: var(--vellum); }
+[data-theme="dark"] .section-title em { color: var(--highlight); }
+
 * { box-sizing: border-box; }
 html, body {
   margin: 0; padding: 0;
@@ -882,7 +932,7 @@ a:hover { color: var(--highlight); border-bottom-color: var(--highlight); }
   transition: opacity 500ms;
 }
 .splash.out { opacity: 0; pointer-events: none; }
-.splash-light { background: var(--bg); }
+.splash { background: var(--bg); }
 .splash-number {
   font-variant-numeric: tabular-nums;
   animation: fadeSlideIn 800ms ease both;

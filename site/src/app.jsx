@@ -21,29 +21,29 @@ function SplashScreen({ onDismiss }) {
   }
 
   return (
-    <div className={"splash splash-light" + (out ? " out" : "")}
+    <div className={"splash" + (out ? " out" : "")}
          onClick={() => ready && dismiss()}>
       {/* Chronicle ruler icon — top left, ink blue */}
       <a href="https://onehundredyears.report"
          style={{ position: "absolute", top: 24, left: 24, textDecoration: "none" }}
          onClick={e => e.stopPropagation()}>
         <svg width="14" height="56" viewBox="0 0 18 72">
-          <line x1="0" y1="0" x2="0" y2="72" stroke="#1B2A4A" strokeWidth="1.5"/>
-          <line x1="0" y1="0"  x2="12" y2="0"  stroke="#1B2A4A" strokeWidth="1.5"/>
-          <line x1="0" y1="8"  x2="7"  y2="8"  stroke="#1B2A4A" strokeWidth="0.8"/>
-          <line x1="0" y1="16" x2="7"  y2="16" stroke="#1B2A4A" strokeWidth="0.8"/>
-          <line x1="0" y1="24" x2="12" y2="24" stroke="#1B2A4A" strokeWidth="1.5"/>
-          <line x1="0" y1="32" x2="7"  y2="32" stroke="#1B2A4A" strokeWidth="0.8"/>
-          <line x1="0" y1="40" x2="7"  y2="40" stroke="#1B2A4A" strokeWidth="0.8"/>
-          <line x1="0" y1="48" x2="12" y2="48" stroke="#1B2A4A" strokeWidth="1.5"/>
-          <line x1="0" y1="56" x2="7"  y2="56" stroke="#1B2A4A" strokeWidth="0.8"/>
-          <line x1="0" y1="64" x2="7"  y2="64" stroke="#1B2A4A" strokeWidth="0.8"/>
-          <line x1="0" y1="72" x2="12" y2="72" stroke="#1B2A4A" strokeWidth="1.5"/>
+          <line x1="0" y1="0" x2="0" y2="72" stroke="var(--ink)" strokeWidth="1.5"/>
+          <line x1="0" y1="0"  x2="12" y2="0"  stroke="var(--ink)" strokeWidth="1.5"/>
+          <line x1="0" y1="8"  x2="7"  y2="8"  stroke="var(--ink)" strokeWidth="0.8"/>
+          <line x1="0" y1="16" x2="7"  y2="16" stroke="var(--ink)" strokeWidth="0.8"/>
+          <line x1="0" y1="24" x2="12" y2="24" stroke="var(--ink)" strokeWidth="1.5"/>
+          <line x1="0" y1="32" x2="7"  y2="32" stroke="var(--ink)" strokeWidth="0.8"/>
+          <line x1="0" y1="40" x2="7"  y2="40" stroke="var(--ink)" strokeWidth="0.8"/>
+          <line x1="0" y1="48" x2="12" y2="48" stroke="var(--ink)" strokeWidth="1.5"/>
+          <line x1="0" y1="56" x2="7"  y2="56" stroke="var(--ink)" strokeWidth="0.8"/>
+          <line x1="0" y1="64" x2="7"  y2="64" stroke="var(--ink)" strokeWidth="0.8"/>
+          <line x1="0" y1="72" x2="12" y2="72" stroke="var(--ink)" strokeWidth="1.5"/>
         </svg>
       </a>
 
       <div className="splash-number" style={{
-        fontSize: "min(120px, 18vw)", fontWeight: 300, color: "#1B2A4A",
+        fontSize: "min(120px, 18vw)", fontWeight: 300, color: "var(--ink)",
         fontFamily: "'Cormorant Garamond', Georgia, serif",
         fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em",
       }}>350,000,000</div>
@@ -56,7 +56,7 @@ function SplashScreen({ onDismiss }) {
 
       <div className="splash-title" style={{
         fontFamily: "'Cormorant Garamond', Georgia, serif",
-        fontSize: "min(36px, 5vw)", fontWeight: 500, color: "#1B2A4A",
+        fontSize: "min(36px, 5vw)", fontWeight: 500, color: "var(--ink)",
         marginTop: 48, textAlign: "center", maxWidth: 640, lineHeight: 1.2,
       }}>One Hundred Years of American Names</div>
 
@@ -104,6 +104,12 @@ function App() {
   const [splashDone, setSplashDone] = React.useState(!!sessionStorage.getItem("corpus_names_seen"));
   const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const [active, setActive] = React.useState(tweaks.tab || "yourname");
+  const [darkMode, setDarkMode] = React.useState(() => localStorage.getItem("names-theme") !== "light");
+
+  React.useEffect(() => {
+    document.documentElement.setAttribute("data-theme", darkMode ? "dark" : "light");
+    localStorage.setItem("names-theme", darkMode ? "dark" : "light");
+  }, [darkMode]);
 
   React.useEffect(() => { setActive(tweaks.tab || "yourname"); }, [tweaks.tab]);
 
@@ -143,17 +149,17 @@ function App() {
           {/* Chronicle decade ruler icon — ink blue on parchment */}
           <a href="https://onehundredyears.report" style={{ textDecoration: "none", display: "flex", alignItems: "center", flexShrink: 0, marginTop: 4 }}>
             <svg width="14" height="56" viewBox="0 0 18 72" style={{ marginRight: 0 }}>
-              <line x1="0" y1="0" x2="0" y2="72" stroke="#1B2A4A" strokeWidth="1.5"/>
-              <line x1="0" y1="0"  x2="12" y2="0"  stroke="#1B2A4A" strokeWidth="1.5"/>
-              <line x1="0" y1="8"  x2="7"  y2="8"  stroke="#1B2A4A" strokeWidth="0.8"/>
-              <line x1="0" y1="16" x2="7"  y2="16" stroke="#1B2A4A" strokeWidth="0.8"/>
-              <line x1="0" y1="24" x2="12" y2="24" stroke="#1B2A4A" strokeWidth="1.5"/>
-              <line x1="0" y1="32" x2="7"  y2="32" stroke="#1B2A4A" strokeWidth="0.8"/>
-              <line x1="0" y1="40" x2="7"  y2="40" stroke="#1B2A4A" strokeWidth="0.8"/>
-              <line x1="0" y1="48" x2="12" y2="48" stroke="#1B2A4A" strokeWidth="1.5"/>
-              <line x1="0" y1="56" x2="7"  y2="56" stroke="#1B2A4A" strokeWidth="0.8"/>
-              <line x1="0" y1="64" x2="7"  y2="64" stroke="#1B2A4A" strokeWidth="0.8"/>
-              <line x1="0" y1="72" x2="12" y2="72" stroke="#1B2A4A" strokeWidth="1.5"/>
+              <line x1="0" y1="0" x2="0" y2="72" stroke="var(--ink)" strokeWidth="1.5"/>
+              <line x1="0" y1="0"  x2="12" y2="0"  stroke="var(--ink)" strokeWidth="1.5"/>
+              <line x1="0" y1="8"  x2="7"  y2="8"  stroke="var(--ink)" strokeWidth="0.8"/>
+              <line x1="0" y1="16" x2="7"  y2="16" stroke="var(--ink)" strokeWidth="0.8"/>
+              <line x1="0" y1="24" x2="12" y2="24" stroke="var(--ink)" strokeWidth="1.5"/>
+              <line x1="0" y1="32" x2="7"  y2="32" stroke="var(--ink)" strokeWidth="0.8"/>
+              <line x1="0" y1="40" x2="7"  y2="40" stroke="var(--ink)" strokeWidth="0.8"/>
+              <line x1="0" y1="48" x2="12" y2="48" stroke="var(--ink)" strokeWidth="1.5"/>
+              <line x1="0" y1="56" x2="7"  y2="56" stroke="var(--ink)" strokeWidth="0.8"/>
+              <line x1="0" y1="64" x2="7"  y2="64" stroke="var(--ink)" strokeWidth="0.8"/>
+              <line x1="0" y1="72" x2="12" y2="72" stroke="var(--ink)" strokeWidth="1.5"/>
             </svg>
           </a>
           <div>
@@ -198,11 +204,11 @@ function App() {
       <footer className="colophon" style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
         <a href="https://onehundredyears.report" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
           <svg width="12" height="36" viewBox="0 0 18 72">
-            <line x1="0" y1="0" x2="0" y2="72" stroke="#1B2A4A" strokeWidth="1.5"/>
-            <line x1="0" y1="0"  x2="12" y2="0"  stroke="#1B2A4A" strokeWidth="1.5"/>
-            <line x1="0" y1="24" x2="12" y2="24" stroke="#1B2A4A" strokeWidth="1.5"/>
-            <line x1="0" y1="48" x2="12" y2="48" stroke="#1B2A4A" strokeWidth="1.5"/>
-            <line x1="0" y1="72" x2="12" y2="72" stroke="#1B2A4A" strokeWidth="1.5"/>
+            <line x1="0" y1="0" x2="0" y2="72" stroke="var(--ink)" strokeWidth="1.5"/>
+            <line x1="0" y1="0"  x2="12" y2="0"  stroke="var(--ink)" strokeWidth="1.5"/>
+            <line x1="0" y1="24" x2="12" y2="24" stroke="var(--ink)" strokeWidth="1.5"/>
+            <line x1="0" y1="48" x2="12" y2="48" stroke="var(--ink)" strokeWidth="1.5"/>
+            <line x1="0" y1="72" x2="12" y2="72" stroke="var(--ink)" strokeWidth="1.5"/>
           </svg>
           <span style={{ fontFamily: "'Cormorant Garamond', Georgia", fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--muted)" }}>
             One Hundred Years
@@ -213,6 +219,15 @@ function App() {
           <a href="https://github.com/doctorbrownphd/hundred-years-names" target="_blank" rel="noopener" style={{ textDecoration: "none", color: "inherit" }}>GitHub</a>
         </div>
       </footer>
+
+      {/* Theme toggle */}
+      <button onClick={() => setDarkMode(!darkMode)} style={{
+        position:"fixed", bottom:20, right:70, zIndex:9998,
+        background:"var(--panel)", color:"var(--ink)", border:"1px solid var(--rule)",
+        fontFamily:"var(--mono)", fontSize:16, width:40, height:40, borderRadius:"50%",
+        cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center",
+        boxShadow:"0 2px 8px rgba(0,0,0,0.15)",
+      }}>{darkMode ? "\u263E" : "\u2600"}</button>
 
       <TweaksPanel title="Tweaks" defaultPos={{right: 24, bottom: 24}}>
         <TweakSection label="Palette">
