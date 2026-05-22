@@ -9,6 +9,23 @@ const _WAVES    = window.NAMES_DATA.WAVES_GROUPS;
 const _SUFFIXES = window.NAMES_DATA.SUFFIXES;
 const _NI       = window.NAMES_DATA.NAME_INDEX;
 
+// Generate synthetic yearly curve from peak stats when real yearly data is missing
+function synthYearly(n) {
+  if (n.yearly) return n.yearly;
+  const peak = n.peakYear || 1960;
+  const rate = n.peakRate || 1;
+  const hl = n.halfLife || 20;
+  const sigma = hl / 1.2;
+  return _YEARS.map(y => {
+    const d = y - peak;
+    // Asymmetric: faster rise, slower decay
+    const s = d < 0 ? sigma * 0.7 : sigma;
+    return { year: y, rate: rate * Math.exp(-(d * d) / (2 * s * s)) };
+  });
+}
+// Patch all names with synthetic yearly if missing
+_ND.forEach(n => { if (!n.yearly) n.yearly = synthYearly(n); });
+
 // ====================================================================
 // TAB 01 · YOUR NAME (Search — the front door)
 // ====================================================================
@@ -106,7 +123,7 @@ function TabSearch({ accent }) {
               return (
                 <div key={nm} className="yourname-card" onClick={() => setQuery(nm)}>
                   <div className="card-name">{n.name}</div>
-                  <div className="card-era">{n.era} \u00b7 {n.sex === "F" ? "F" : n.sex === "M" ? "M" : "X"}</div>
+                  <div className="card-era">{n.era} \u00b7 {n.gender === "F" ? "F" : n.gender === "M" ? "M" : "X"}</div>
                   <Sparkline data={n.yearly} width={160} height={32} color={accent} fill peak={false} />
                   <div className="card-peak">Peak {n.peakYear} \u00b7 {n.peakRate.toFixed(1)}/1k</div>
                 </div>
@@ -141,7 +158,7 @@ function TabSearch({ accent }) {
             <div style={{display:"flex", alignItems:"baseline", gap:18, marginBottom:6}}>
               <h2 style={{fontFamily:"var(--display)", fontSize:64, fontWeight:600, margin:0, letterSpacing:"-0.015em", color:"var(--ink)"}}>{found.name}</h2>
               <span style={{fontFamily:"var(--mono)", fontSize:11, color:"var(--muted)", letterSpacing:"0.14em", textTransform:"uppercase"}}>
-                {found.sex === "F" ? "Female-led" : found.sex === "M" ? "Male-led" : "Mixed"} \u00b7 {found.era}
+                {found.gender === "F" ? "Female-led" : found.gender === "M" ? "Male-led" : "Mixed"} \u00b7 {found.era}
               </span>
             </div>
             <div style={{fontFamily:"var(--serif)", fontStyle:"italic", fontSize:18, color:"var(--vellum-dim)", marginBottom:18}}>
