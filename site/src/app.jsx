@@ -78,7 +78,7 @@ function App() {
             <div className="series" style={{ fontFamily: "'Cormorant Garamond', var(--display, Georgia)", fontWeight: 600, letterSpacing: "0.25em", fontSize: 10 }}>
               <span>One Hundred Years of</span>
             </div>
-            <h1>A Century of <em>American Names</em>.</h1>
+            <h1><em>American Names.</em></h1>
             <div className="sub">
               144 years of birth certificates, read as a cultural record.
               Every name a wave, every wave a generation.
