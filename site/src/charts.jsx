@@ -7,9 +7,15 @@ const _ERAS_C = window.NAMES_DATA.ERAS;
 const _DIVERSITY = window.NAMES_DATA.DIVERSITY;
 const _NAME_INDEX = window.NAMES_DATA.NAME_INDEX;
 const ERA_COLOR = Object.fromEntries(_ERAS_C.map(e => [e.id, e.color]));
+// Map data-format era labels to display colors
+ERA_COLOR["Era 0"] = _ERAS_C.find(e => e.id === "classic")?.color || "#a08456";
+ERA_COLOR["Era 1"] = _ERAS_C.find(e => e.id === "suburban")?.color || "#d4a64a";
+ERA_COLOR["Era 2"] = _ERAS_C.find(e => e.id === "modern")?.color || "#6f8aa8";
+ERA_COLOR["Unclassified"] = "#9BA5AF";
+// Curve-type fallback colors (used in archetype cards)
 ERA_COLOR.flash = "#C4897A";
-ERA_COLOR.killed = "#9BA5AF";
 ERA_COLOR.steady = "#D5CFC3";
+ERA_COLOR.revival = "#8fa05a";
 
 // === Sparkline =========================================================
 function Sparkline({ data, width = 180, height = 28, color = "#1B2A4A", peak = true, fill = false, baselineYear, peakLabel = false }) {
@@ -88,7 +94,8 @@ function Landscape({ width = 940, height = 360, selectedEra = null, onHover, hov
     return `M${up.join(" L")} L${lo.join(" L")} Z`;
   });
 
-  const dim = selectedEra ? (era) => era === selectedEra ? 1 : 0.18 : () => 1;
+  const selEraYears = selectedEra ? (_ERAS_C.find(e => e.id === selectedEra)?.years || [0, 9999]) : null;
+  const dim = selEraYears ? (n) => (n.peakYear >= selEraYears[0] && n.peakYear <= selEraYears[1]) ? 1 : 0.18 : () => 1;
 
   // Labels: place a few key names at their peak position
   const labelPicks = ["Mary", "Linda", "Jennifer", "Emma", "Olivia"];
@@ -127,9 +134,9 @@ function Landscape({ width = 940, height = 360, selectedEra = null, onHover, hov
       {ranked.map((n, ni) => (
         <path key={n.name} d={paths[ni]}
               fill={ERA_COLOR[n.era] || "#888"}
-              fillOpacity={dim(n.era) * 0.7}
+              fillOpacity={dim(n) * 0.7}
               stroke={ERA_COLOR[n.era] || "#888"}
-              strokeOpacity={dim(n.era) * 0.35}
+              strokeOpacity={dim(n) * 0.35}
               strokeWidth="0.4" />
       ))}
 
@@ -178,7 +185,8 @@ function Landscape({ width = 940, height = 360, selectedEra = null, onHover, hov
 
 // === Full wave chart for a single name with annotations ================
 function WaveChart({ name, width = 920, height = 280, annotations = [], color = "#1B2A4A" }) {
-  const n = _NAME_INDEX[name.toLowerCase()];
+  const q = name.toLowerCase();
+  const n = _NAME_INDEX[q] || _NAME_INDEX[q + "_F"] || _NAME_INDEX[q + "_M"];
   if (!n) return null;
   const data = n.yearly;
   const max = Math.max(...data.map(d => d.rate)) * 1.12 || 1;

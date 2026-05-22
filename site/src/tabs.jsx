@@ -114,7 +114,7 @@ function TabSearch({ accent }) {
     if (!query.trim()) return null;
     const q = query.trim().toLowerCase();
     // Try exact match, then with _f, then with _m (prefer the more common gender)
-    return _NI[q] || _NI[q + "_f"] || _NI[q + "_m"] || _NI[q + "_F"] || _NI[q + "_M"] || null;
+    return _NI[q] || _NI[q + "_F"] || _NI[q + "_M"] || null;
   }, [query]);
 
   const annotations = React.useMemo(() => {
@@ -263,7 +263,7 @@ function TabSearch({ accent }) {
                   <div className="card-name">{n.name}</div>
                   <div className="card-era">{n.era} · {n.gender === "F" ? "F" : n.gender === "M" ? "M" : "X"}</div>
                   <Sparkline data={n.yearly} width={160} height={32} color={accent} fill peak={false} />
-                  <div className="card-peak">Peak {n.peakYear} · {n.peakRate.toFixed(1)}/1k</div>
+                  <div className="card-peak">Peak {n.peakYear} · {(n.peakRate||0).toFixed(1)}/1k</div>
                 </div>
               );
             })}
@@ -317,7 +317,7 @@ function TabSearch({ accent }) {
                 </div>
                 <div className="nrs-item">
                   <div className="nrs-label">Peak rate</div>
-                  <div className="nrs-value">{found.peakRate.toFixed(2)}<span style={{fontFamily:"var(--mono)",fontSize:"10px",color:"var(--muted)",marginLeft:4}}>/1k</span></div>
+                  <div className="nrs-value">{(found.peakRate||0).toFixed(2)}<span style={{fontFamily:"var(--mono)",fontSize:"10px",color:"var(--muted)",marginLeft:4}}>/1k</span></div>
                 </div>
                 <div className="nrs-item">
                   <div className="nrs-label">Half-life</div>
@@ -325,7 +325,7 @@ function TabSearch({ accent }) {
                 </div>
                 <div className="nrs-item">
                   <div className="nrs-label">Curve type</div>
-                  <div className="nrs-value" style={{fontSize:16, fontFamily:"var(--serif)"}}>{found.era === "flash" ? "Flash" : found.era === "killed" ? "Kill" : found.era === "steady" ? "Steady" : "Wave"}</div>
+                  <div className="nrs-value" style={{fontSize:16, fontFamily:"var(--serif)"}}>{found.curveType === "flash" ? "Flash" : found.curveType === "steady" ? "Steady" : found.curveType === "revival" ? "Revival" : "Wave"}</div>
                 </div>
                 <div className="nrs-item">
                   <div className="nrs-label">Era</div>
@@ -334,13 +334,13 @@ function TabSearch({ accent }) {
               </div>
 
               <p className="search-narrative">
-                <em>{found.name}</em> peaked in {found.peakYear} at {found.peakRate.toFixed(2)} per
-                thousand babies — meaning that of every {Math.round(1000/Math.max(found.peakRate, 0.001))} born
+                <em>{found.name}</em> peaked in {found.peakYear} at {(found.peakRate||0).toFixed(2)} per
+                thousand babies — meaning that of every {Math.round(1000/Math.max(found.peakRate||0.001, 0.001))} born
                 that year, one was named {found.name}. {narrate(found).split(". ").slice(1).join(". ")}
               </p>
               <p className="search-narrative">
-                By 2024, the rate has settled to {found.currentRate.toFixed(2)} per thousand —
-                a {found.peakRate > 0 ? Math.round((1 - found.currentRate/found.peakRate)*100) : 0}% decline from peak.
+                By 2024, the rate has settled to {(found.currentRate != null ? found.currentRate.toFixed(2) : "—")} per thousand —
+                a {found.peakRate > 0 && found.currentRate != null ? Math.round((1 - found.currentRate/found.peakRate)*100) : 0}% decline from peak.
                 Belongs to <em>{eraLabel(found.era)}</em> alongside {related.slice(0,3).map(r => r.name).join(", ")}.
               </p>
 
@@ -441,10 +441,10 @@ function TabSearch({ accent }) {
             <section>
               <h4>Numbers</h4>
               <div className="rel"><span className="nm">Peak year</span><span className="v">{found.peakYear}</span></div>
-              <div className="rel"><span className="nm">Peak rate</span><span className="v">{found.peakRate.toFixed(2)}/1k</span></div>
-              <div className="rel"><span className="nm">Rise time</span><span className="v">{found.riseTime ?? "—"} yr</span></div>
+              <div className="rel"><span className="nm">Peak rate</span><span className="v">{(found.peakRate||0).toFixed(2)}/1k</span></div>
+              <div className="rel"><span className="nm">Curve type</span><span className="v">{found.curveType || "—"}</span></div>
               <div className="rel"><span className="nm">Half-life</span><span className="v">{found.halfLife ?? "—"} yr</span></div>
-              <div className="rel"><span className="nm">Current rate</span><span className="v">{found.currentRate.toFixed(2)}/1k</span></div>
+              <div className="rel"><span className="nm">Current rate</span><span className="v">{(found.currentRate != null ? found.currentRate.toFixed(2) : "—")}/1k</span></div>
               <div className="rel"><span className="nm">Stronghold</span><span className="v" style={{fontFamily:"var(--serif)", fontStyle:"italic"}}>{stronghold}</span></div>
             </section>
 
@@ -543,7 +543,7 @@ function TabWaves({ accent }) {
           ].map((k, i) => {
             const n = _NI[k.key];
             if (!n) return null;
-            const decline = ((n.currentRate - n.peakRate) / n.peakRate * 100).toFixed(0);
+            const decline = (((n.currentRate||0) - (n.peakRate||1)) / (n.peakRate||1) * 100).toFixed(0);
             return (
               <div key={k.key} style={{
                 padding:"20px 18px 22px",
@@ -556,9 +556,9 @@ function TabWaves({ accent }) {
                 <Sparkline data={synthYearly(n)} width={160} height={36} color={accent} fill peak={false} />
                 <div style={{marginTop:10, display:"flex", justifyContent:"space-between", alignItems:"baseline"}}>
                   <div style={{fontFamily:"var(--mono)", fontSize:11, color:"var(--vellum-dim)"}}>
-                    {n.peakRate.toFixed(1)}<span style={{fontSize:9, color:"var(--muted)"}}>/1k</span>
+                    {(n.peakRate||0).toFixed(1)}<span style={{fontSize:9, color:"var(--muted)"}}>/1k</span>
                     <span style={{margin:"0 4px", color:"var(--rule)"}}>→</span>
-                    {n.currentRate.toFixed(1)}<span style={{fontSize:9, color:"var(--muted)"}}>/1k</span>
+                    {(n.currentRate||0).toFixed(1)}<span style={{fontSize:9, color:"var(--muted)"}}>/1k</span>
                   </div>
                   <div style={{fontFamily:"var(--mono)", fontSize:13, fontWeight:600, color:"#B44", letterSpacing:"-0.01em"}}>
                     {decline}%
@@ -580,9 +580,10 @@ function TabEra({ accent }) {
   const [selected, setSelected] = React.useState("Jennifer");
   const [eraFilter, setEraFilter] = React.useState(null);
 
+  const eraYears = eraFilter ? (_ERAS.find(e => e.id === eraFilter)?.years || [0, 9999]) : null;
   const namesForHeatmap = _ND
     .filter(n => n.peakRate >= 1.0 || ["Khaleesi","Alexa","Karen","Diana","Elsa","Arya"].includes(n.name))
-    .filter(n => !eraFilter || n.era === eraFilter)
+    .filter(n => !eraYears || (n.peakYear >= eraYears[0] && n.peakYear <= eraYears[1]))
     .slice(0, 60);
 
   const _q = selected.toLowerCase();
@@ -633,7 +634,7 @@ function TabEra({ accent }) {
             <div className="stats">
               <div><div className="k">Peak year</div><div className="v">{sel.peakYear}</div></div>
               <div><div className="k">Peak rate</div><div className="v">{(sel.peakRate||0).toFixed(2)}<span style={{fontFamily:"var(--mono)",fontSize:"10px",color:"var(--muted)",marginLeft:4}}>/1k</span></div></div>
-              <div><div className="k">Rise time</div><div className="v">{sel.riseTime ?? "—"}<span style={{fontFamily:"var(--mono)",fontSize:"10px",color:"var(--muted)",marginLeft:4}}>yr</span></div></div>
+              <div><div className="k">Curve type</div><div className="v">{sel.curveType || "—"}</div></div>
               <div><div className="k">Half-life</div><div className="v">{sel.halfLife ?? "—"}<span style={{fontFamily:"var(--mono)",fontSize:"10px",color:"var(--muted)",marginLeft:4}}>yr</span></div></div>
             </div>
             <p>{narrate(sel)}</p>
@@ -660,25 +661,25 @@ function TabEra({ accent }) {
 }
 
 function curveTypeLabel(n) {
-  if (n.era === "flash") return "A flash. Owes its existence to a single cultural moment.";
-  if (n.era === "killed") return "A kill. Brand or event claimed the name.";
-  if (n.era === "steady") return "A steady. Never peaks, never disappears.";
+  if (n.curveType === "flash") return "A flash. Owes its existence to a single cultural moment.";
+  if (n.curveType === "steady") return "A steady. Never peaks, never disappears.";
+  if (n.curveType === "revival") return "A revival. Two peaks, a century apart.";
   if (!n.halfLife) return "Still rising. The curve is incomplete.";
   return `A classic wave. Right-skewed: fast rise, slow decay (half-life ${n.halfLife} yr).`;
 }
 
 function narrate(n) {
-  const total = (n.peakRate * 4000000 / 1000).toFixed(0);
-  if (n.era === "flash") {
+  const total = ((n.peakRate||0) * 4000000 / 1000).toFixed(0);
+  if (n.curveType === "flash") {
     return `${n.name} did not exist in the SSA record before ${n.peakYear - 2}. Its appearance is the cleanest kind of cultural signature: a name that owes its entire history to a single trigger.`;
   }
-  if (n.era === "killed") {
-    return `${n.name} peaked at ${n.peakRate.toFixed(2)} per thousand in ${n.peakYear}, then collapsed. The half-life after the kill event was ${n.halfLife} years — among the fastest decays in the corpus.`;
-  }
-  if (n.era === "steady" || !n.halfLife) {
+  if (n.curveType === "steady" || !n.halfLife) {
     return `${n.name} is one of the corpus's steadies — a name that has never peaked sharply and has never disappeared. It anchors the dataset.`;
   }
-  return `${n.name} peaked in ${n.peakYear} at ${n.peakRate.toFixed(2)} per thousand. Roughly ${total} American babies received this name in its peak year alone. The decay follows a clean half-life of ${n.halfLife} years — the canonical wave shape.`;
+  if (n.curveType === "revival") {
+    return `${n.name} peaked in ${n.peakYear} at ${(n.peakRate||0).toFixed(2)} per thousand. A revival — two peaks, a century apart. The second wave is a deliberate act of cultural archaeology.`;
+  }
+  return `${n.name} peaked in ${n.peakYear} at ${(n.peakRate||0).toFixed(2)} per thousand. Roughly ${total} American babies received this name in its peak year alone. The decay follows a clean half-life of ${n.halfLife} years — the canonical wave shape.`;
 }
 
 // ====================================================================
@@ -1295,8 +1296,12 @@ function TabOverview({ accent }) {
 }
 
 function eraLabel(id) {
+  if (!id) return "Unclassified";
   const e = _ERAS.find(x => x.id === id);
-  return e ? e.label : id;
+  if (e) return e.label;
+  // Map data-format era labels to display names
+  const map = { "Era 0": "Classic", "Era 1": "Suburban", "Era 2": "Modern", "Unclassified": "Unclassified" };
+  return map[id] || id;
 }
 
 Object.assign(window, {
