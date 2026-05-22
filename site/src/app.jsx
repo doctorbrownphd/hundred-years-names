@@ -47,18 +47,32 @@ function App() {
       fontSize: tweaks.density === "compact" ? "16px" : "17px"
     }} data-screen-label={`07 ${TABS.find(t => t.id === active)?.label}`}>
       <header className="masthead">
-        <div>
-          <div className="series">
-            <span>One Hundred Years</span>
-            <span className="sep">·</span>
-            <span>Entry 02</span>
-            <span className="sep">·</span>
-            <span>Names</span>
-          </div>
-          <h1>A Century of <em>American Names</em>.</h1>
-          <div className="sub">
-            144 years of birth certificates, read as a cultural record.
-            Every name a wave, every wave a generation.
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 18 }}>
+          {/* Chronicle decade ruler icon */}
+          <a href="https://onehundredyears.report" style={{ textDecoration: "none", display: "flex", alignItems: "center", flexShrink: 0, marginTop: 4 }}>
+            <svg width="14" height="56" viewBox="0 0 18 72" style={{ marginRight: 0 }}>
+              <line x1="0" y1="0" x2="0" y2="72" stroke="var(--amber, #d4a64a)" strokeWidth="1.5"/>
+              <line x1="0" y1="0"  x2="12" y2="0"  stroke="var(--amber, #d4a64a)" strokeWidth="1.5"/>
+              <line x1="0" y1="8"  x2="7"  y2="8"  stroke="var(--amber, #d4a64a)" strokeWidth="0.8"/>
+              <line x1="0" y1="16" x2="7"  y2="16" stroke="var(--amber, #d4a64a)" strokeWidth="0.8"/>
+              <line x1="0" y1="24" x2="12" y2="24" stroke="var(--amber, #d4a64a)" strokeWidth="1.5"/>
+              <line x1="0" y1="32" x2="7"  y2="32" stroke="var(--amber, #d4a64a)" strokeWidth="0.8"/>
+              <line x1="0" y1="40" x2="7"  y2="40" stroke="var(--amber, #d4a64a)" strokeWidth="0.8"/>
+              <line x1="0" y1="48" x2="12" y2="48" stroke="var(--amber, #d4a64a)" strokeWidth="1.5"/>
+              <line x1="0" y1="56" x2="7"  y2="56" stroke="var(--amber, #d4a64a)" strokeWidth="0.8"/>
+              <line x1="0" y1="64" x2="7"  y2="64" stroke="var(--amber, #d4a64a)" strokeWidth="0.8"/>
+              <line x1="0" y1="72" x2="12" y2="72" stroke="var(--amber, #d4a64a)" strokeWidth="1.5"/>
+            </svg>
+          </a>
+          <div>
+            <div className="series" style={{ fontFamily: "'Cormorant Garamond', var(--serif, Georgia)", fontWeight: 600, letterSpacing: "0.25em", fontSize: 10 }}>
+              <span>One Hundred Years of</span>
+            </div>
+            <h1 style={{ fontFamily: "'Playfair Display', var(--serif, Georgia)" }}>A Century of <em>American Names</em>.</h1>
+            <div className="sub">
+              144 years of birth certificates, read as a cultural record.
+              Every name a wave, every wave a generation.
+            </div>
           </div>
         </div>
         <div className="meta">
@@ -89,13 +103,23 @@ function App() {
         {active === "search"     && <TabSearch accent={palette.accent} />}
       </main>
 
-      <footer className="colophon">
-        <div>
-          Set in EB Garamond &amp; IBM Plex Mono. Charts hand-drawn in SVG.
-          Built in the spirit of Tufte's <em>Visual Display of Quantitative Information</em>.
-          A One Hundred Years series entry.
+      <footer className="colophon" style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+        <a href="https://onehundredyears.report" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
+          <svg width="12" height="36" viewBox="0 0 18 72">
+            <line x1="0" y1="0" x2="0" y2="72" stroke="var(--amber, #d4a64a)" strokeWidth="1.5"/>
+            <line x1="0" y1="0"  x2="12" y2="0"  stroke="var(--amber, #d4a64a)" strokeWidth="1.5"/>
+            <line x1="0" y1="24" x2="12" y2="24" stroke="var(--amber, #d4a64a)" strokeWidth="1.5"/>
+            <line x1="0" y1="48" x2="12" y2="48" stroke="var(--amber, #d4a64a)" strokeWidth="1.5"/>
+            <line x1="0" y1="72" x2="12" y2="72" stroke="var(--amber, #d4a64a)" strokeWidth="1.5"/>
+          </svg>
+          <span style={{ fontFamily: "'Cormorant Garamond', Georgia", fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", opacity: 0.7 }}>
+            One Hundred Years
+          </span>
+        </a>
+        <div style={{ marginLeft: "auto", display: "flex", gap: 18, alignItems: "center", fontFamily: "var(--mono, monospace)", fontSize: 10, letterSpacing: "0.1em", opacity: 0.5 }}>
+          <span>MIT</span>
+          <a href="https://github.com/doctorbrownphd/hundred-years-names" target="_blank" rel="noopener" style={{ textDecoration: "none", color: "inherit" }}>GitHub</a>
         </div>
-        <div className="mono">© 2026 · ONEHUNDREDYEARS.REPORT</div>
       </footer>
 
       <TweaksPanel title="Tweaks" defaultPos={{right: 24, bottom: 24}}>
