@@ -26,6 +26,82 @@ function synthYearly(n) {
 // Patch all names with synthetic yearly if missing
 _ND.forEach(n => { if (!n.yearly) n.yearly = synthYearly(n); });
 
+// ── Lead/Lag Map (wrapper around USMap with diverging color scale) ──
+function LeadLagMap({ states, onHover }) {
+  // Custom color: blue for leads (negative), rose for lags (positive), neutral in middle
+  const leadColor = (lead) => {
+    if (lead < -0.5) {
+      const t = Math.min(1, Math.abs(lead) / 5);
+      return `rgb(${Math.round(160 - t*80)}, ${Math.round(181 - t*60)}, ${Math.round(196 + t*20)})`;
+    }
+    if (lead > 0.5) {
+      const t = Math.min(1, lead / 5);
+      return `rgb(${Math.round(196 + t*20)}, ${Math.round(160 - t*40)}, ${Math.round(140 - t*30)})`;
+    }
+    return "#DDDFE4";
+  };
+
+  // USMap expects stateData with {st, name, count}. We override the fill via a custom render.
+  // Since USMap doesn't support custom fill functions, render our own SVG using the same topology.
+  const [paths, setPaths] = React.useState(null);
+  React.useEffect(() => {
+    fetch("src/us-states-topo.json")
+      .then(r => r.json())
+      .then(topo => {
+        // Reuse the decode logic from USMap
+        if (window._decodeTopo) {
+          setPaths(window._decodeTopo(topo));
+        } else {
+          // Inline decode
+          const { arcs: rawArcs, transform } = topo;
+          const { scale: [sx, sy], translate: [tx, ty] } = transform;
+          const arcs = rawArcs.map(arc => {
+            let x = 0, y = 0;
+            return arc.map(([dx, dy]) => { x += dx; y += dy; return [x * sx + tx, y * sy + ty]; });
+          });
+          const arcToCoords = (idx) => idx >= 0 ? arcs[idx].slice() : arcs[~idx].slice().reverse();
+          const ringToCoords = (ring) => { let c = []; ring.forEach(i => { c = c.concat(arcToCoords(i)); }); return c; };
+          const FIPS = {"01":"AL","02":"AK","04":"AZ","05":"AR","06":"CA","08":"CO","09":"CT","10":"DE","11":"DC","12":"FL","13":"GA","15":"HI","16":"ID","17":"IL","18":"IN","19":"IA","20":"KS","21":"KY","22":"LA","23":"ME","24":"MD","25":"MA","26":"MI","27":"MN","28":"MS","29":"MO","30":"MT","31":"NE","32":"NV","33":"NH","34":"NJ","35":"NM","36":"NY","37":"NC","38":"ND","39":"OH","40":"OK","41":"OR","42":"PA","44":"RI","45":"SC","46":"SD","47":"TN","48":"TX","49":"UT","50":"VT","51":"VA","53":"WA","54":"WV","55":"WI","56":"WY"};
+          const result = {};
+          topo.objects.states.geometries.forEach(g => {
+            const st = FIPS[g.id]; if (!st) return;
+            let d = "";
+            (g.type === "Polygon" ? [g.arcs] : g.arcs).forEach(poly => poly.forEach(ring => {
+              ringToCoords(ring).forEach((pt, i) => { d += (i === 0 ? "M" : "L") + pt[0].toFixed(1) + "," + pt[1].toFixed(1); });
+              d += "Z";
+            }));
+            result[st] = d;
+          });
+          setPaths(result);
+        }
+      });
+  }, []);
+
+  const byState = React.useMemo(() => Object.fromEntries(states.map(s => [s.st, s])), [states]);
+
+  if (!paths) return <div style={{height:300, display:"flex", alignItems:"center", justifyContent:"center", color:"var(--muted)"}}>Loading map…</div>;
+
+  return (
+    <svg viewBox="-70 80 990 540" preserveAspectRatio="xMidYMid meet" style={{width:"100%", height:"auto", maxHeight:400, display:"block"}}>
+      {Object.entries(paths).map(([st, d]) => {
+        const s = byState[st];
+        const lead = s ? s.lead : 0;
+        return (
+          <path key={st} d={d}
+            fill={leadColor(lead)}
+            stroke="#FAFAFC"
+            strokeWidth="1.2"
+            strokeLinejoin="round"
+            style={{cursor:"default", transition:"fill 200ms"}}
+            onMouseEnter={() => onHover && onHover(s || {st, lead: 0})}
+            onMouseLeave={() => onHover && onHover(null)}
+          />
+        );
+      })}
+    </svg>
+  );
+}
+
 // ====================================================================
 // TAB 01 · YOUR NAME (Search — the front door)
 // ====================================================================
@@ -421,6 +497,28 @@ function TabGeo({ accent }) {
     { abbr:"WV", name:"West Virginia",lead:  5.2, top:["Oliver","Liam","Wyatt"] },
   ];
 
+  // Build full state map data — lead/lag as the value, for choropleth coloring
+  const allStates = [
+    "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
+    "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
+    "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY","DC"
+  ];
+  const leadByState = Object.fromEntries(states.map(s => [s.abbr, s.lead]));
+  // Synthetic lead values for states not in our 12-state sample
+  const syntheticLeads = {
+    AK:3.8, AZ:-0.4, AR:3.2, CO:-1.4, CT:-2.6, DE:0.2, GA:1.8, HI:-0.8, ID:3.0, IN:1.2,
+    IA:2.4, KS:2.6, KY:2.8, LA:2.2, ME:1.6, MD:-1.2, MI:0.8, MS:3.6, MO:1.8, MT:3.4,
+    NE:2.8, NV:-0.6, NH:0.4, NJ:-2.0, NM:1.0, NC:1.4, OH:0.6, OK:2.4, OR:-1.6, PA:-0.2,
+    RI:-1.0, SC:2.0, SD:3.2, TN:1.6, VT:0.8, VA:0.2, WI:1.2, WY:3.6, DC:-2.8,
+  };
+  const mapStates = allStates.map(st => ({
+    st,
+    name: st,
+    count: Math.abs(leadByState[st] ?? syntheticLeads[st] ?? 0), // absolute lag for intensity
+    lead: leadByState[st] ?? syntheticLeads[st] ?? 0,
+  }));
+  const [hoveredState, setHoveredState] = React.useState(null);
+
   const W = 620, H = 28 * states.length + 40;
   const padL = 120, padR = 10, padT = 24, padB = 16;
   const innerW = W - padL - padR;
@@ -443,6 +541,26 @@ function TabGeo({ accent }) {
           adoption rate crosses 50% of its eventual peak. The difference between earliest
           and latest state defines that state's <em>diffusion lag</em>.
         </p>
+
+        {/* Lead/lag choropleth map */}
+        <div style={{margin:"24px 0 32px", position:"relative"}}>
+          <div style={{display:"flex", justifyContent:"center", gap:24, marginBottom:12, fontFamily:"var(--mono)", fontSize:10, letterSpacing:"0.12em", textTransform:"uppercase", color:"var(--muted)"}}>
+            <span><span style={{display:"inline-block", width:12, height:12, background:"var(--era-individuality)", borderRadius:2, marginRight:6, verticalAlign:"middle"}}/>Leads (coastal)</span>
+            <span><span style={{display:"inline-block", width:12, height:12, background:"var(--rule)", borderRadius:2, marginRight:6, verticalAlign:"middle"}}/>Neutral</span>
+            <span><span style={{display:"inline-block", width:12, height:12, background:"var(--era-hollywood)", borderRadius:2, marginRight:6, verticalAlign:"middle"}}/>Lags (interior)</span>
+          </div>
+          <LeadLagMap states={mapStates} onHover={setHoveredState} />
+          {hoveredState && (
+            <div style={{
+              position:"absolute", top:8, right:8,
+              fontFamily:"var(--mono)", fontSize:11, color:"var(--ink)",
+              background:"var(--panel)", padding:"8px 12px", borderRadius:4,
+              border:"1px solid var(--rule)", boxShadow:"0 2px 8px rgba(27,42,74,0.08)",
+            }}>
+              <strong>{hoveredState.st}</strong> — {hoveredState.lead > 0 ? "+" : ""}{hoveredState.lead.toFixed(1)} yr
+            </div>
+          )}
+        </div>
 
         <div className="twocol">
           <div>
