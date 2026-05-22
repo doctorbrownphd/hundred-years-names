@@ -160,33 +160,58 @@ function TabSearch({ accent }) {
       .slice(0, 5);
   }, [found]);
 
-  // Your Life in Names — top names at different life-stage offsets
+  // Birth year — inferred from peak, overridable
+  const [birthOverride, setBirthOverride] = React.useState(null);
+  const birthYear = birthOverride || (found ? found.peakYear : null);
+
+  // Your Life in Names — biography generator
   const lifeStages = React.useMemo(() => {
-    if (!found) return [];
-    const birthYear = found.peakYear;
-    const isFemale = found.gender === "F";
-    const sameGender = (n) => n.gender === found.gender;
-    const oppGender = (n) => n.gender !== found.gender;
-    const topAt = (year, filter, count=3) =>
-      _ND.filter(n => n.name !== found.name && filter(n) && Math.abs(n.peakYear - year) <= 2)
-          .sort((a,b) => b.peakRate - a.peakRate)
-          .slice(0, count)
-          .map(n => n.name);
-    const stages = [];
-    // Best friend (age 6-10, same gender)
-    stages.push({ age:"Age 6", label:"Your best friend was probably", names: topAt(birthYear, sameGender), note: `elementary school, ~${birthYear + 6}` });
-    // First crush (age 12-14, opposite gender)
-    stages.push({ age:"Age 13", label: isFemale ? "Your first crush was likely a" : "Your first crush was likely a", names: topAt(birthYear, oppGender), note:`middle school, ~${birthYear + 13}` });
-    // Teacher (born ~25 years before you)
-    stages.push({ age:"Your teacher", label:"Was probably named", names: topAt(birthYear - 25, (n) => n.gender === "F"), note:`born ~${birthYear - 25}` });
-    // Your kids (when you were ~30)
-    if (birthYear + 30 <= 2024) {
-      stages.push({ age:"Your kids", label:"If you followed the trend, are named", names: topAt(birthYear + 30, sameGender), note:`born ~${birthYear + 30}` });
+    if (!found || !birthYear) return [];
+    const by = birthYear;
+    const sameG = (n) => n.gender === found.gender;
+    const oppG = (n) => n.gender !== found.gender;
+    const anyG = () => true;
+    // Look up top names peaking near a target year, filtered by gender
+    const topAt = (targetYear, genderFn, count=3) => {
+      const window = 3;
+      return _ND
+        .filter(n => n.name !== found.name && genderFn(n) && Math.abs(n.peakYear - targetYear) <= window)
+        .sort((a,b) => b.peakRate - a.peakRate)
+        .slice(0, count);
+    };
+    const fmtNames = (arr) => arr.map(n => n.name);
+    const fmtPct = (arr) => arr.length > 0 ? (arr[0].peakRate / 10).toFixed(1) + "%" : "";
+
+    const stages = [
+      { age:"At 6", label:"your best friend was probably named",
+        names: fmtNames(topAt(by, sameG)), pct: fmtPct(topAt(by, sameG)),
+        note:`elementary school, ~${by + 6}`, icon:"◉" },
+      { age:"At 13", label:"your first crush was almost certainly a",
+        names: fmtNames(topAt(by, oppG)), pct: fmtPct(topAt(by, oppG)),
+        note:`middle school, ~${by + 13}`, icon:"♡" },
+      { age:"At 22", label:"your college roommate was likely a",
+        names: fmtNames(topAt(by + 1, sameG)), pct: fmtPct(topAt(by + 1, sameG)),
+        note:`college, ~${by + 22}`, icon:"◎" },
+      { age:"Your teachers", label:"were named",
+        names: fmtNames(topAt(by - 27, (n) => n.gender === "F")), pct: "",
+        note:`born ~${by - 27}, peaked 25 years before you`, icon:"▪" },
+      { age:"Your boss", label:"was probably a",
+        names: fmtNames(topAt(by - 12, (n) => n.gender === "M")), pct: "",
+        note:`born ~${by - 12}`, icon:"▸" },
+    ];
+    // Kids (only if birth year + 30 <= 2024)
+    if (by + 30 <= 2024) {
+      stages.push({ age:"Your kids", label:"if you followed the trend — are named",
+        names: fmtNames(topAt(by + 30, anyG)), pct: fmtPct(topAt(by + 30, anyG)),
+        note:`born ~${by + 30}`, icon:"✦" });
     }
-    // Boss at first job (born ~20 years before you)
-    stages.push({ age:"Your first boss", label:"Was probably named", names: topAt(birthYear - 20, (n) => n.gender === "M"), note:`born ~${birthYear - 20}` });
+    // Grandchildren (current top names)
+    stages.push({ age:"Your grandchildren", label:"will grow up knowing an",
+      names: fmtNames(_ND.filter(n => n.peakYear >= 2020).sort((a,b) => b.peakRate - a.peakRate).slice(0,3)),
+      pct: "", note:"born ~now", icon:"✧" });
+
     return stages.filter(s => s.names.length > 0);
-  }, [found]);
+  }, [found, birthYear]);
 
   const stronghold = React.useMemo(() => {
     if (!found) return null;
@@ -346,39 +371,66 @@ function TabSearch({ accent }) {
                 </div>
               )}
 
-              {/* Your Life in Names */}
+              {/* Your Biography — life stages derived from name data */}
               {lifeStages.length > 0 && (
-                <div style={{marginTop:28, padding:"24px 24px 20px", background:"var(--panel)", borderRadius:6, border:"1px solid var(--rule)"}}>
-                  <div style={{fontFamily:"var(--mono)", fontSize:10, letterSpacing:"0.16em", textTransform:"uppercase", color:"var(--muted)", marginBottom:6}}>
-                    Your Life in Names
+                <div style={{marginTop:36, padding:"28px 28px 24px", background:"var(--panel)", borderRadius:8, border:"1px solid var(--rule)", position:"relative"}}>
+                  <div style={{display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:6}}>
+                    <div style={{fontFamily:"var(--mono)", fontSize:10, letterSpacing:"0.16em", textTransform:"uppercase", color:"var(--ink)"}}>
+                      Your Biography
+                    </div>
+                    <div style={{fontFamily:"var(--mono)", fontSize:9, color:"var(--muted)"}}>
+                      born ~{birthYear} {birthOverride ? "(override)" : "(inferred from peak)"}
+                      <input type="number" min="1880" max="2024" placeholder="year"
+                        style={{width:52, marginLeft:8, fontFamily:"var(--mono)", fontSize:9, border:"1px solid var(--rule)",
+                          borderRadius:3, padding:"2px 4px", background:"var(--bg)", color:"var(--ink)", outline:"none"}}
+                        onChange={e => {
+                          const v = parseInt(e.target.value);
+                          setBirthOverride(v >= 1880 && v <= 2024 ? v : null);
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div style={{fontFamily:"var(--serif)", fontStyle:"italic", fontSize:14, color:"var(--vellum-dim)", marginBottom:18, lineHeight:1.5}}>
-                    If your name is {found.name}, you were most likely born around {found.peakYear}. Here's who surrounded you:
+                  <div style={{fontFamily:"var(--display)", fontSize:22, fontWeight:600, color:"var(--ink)", marginBottom:4}}>
+                    Your name is {found.name}.
                   </div>
-                  <div style={{display:"flex", flexDirection:"column", gap:0}}>
+                  <div style={{fontFamily:"var(--serif)", fontStyle:"italic", fontSize:14, color:"var(--vellum-dim)", marginBottom:20, lineHeight:1.5}}>
+                    You were most likely born between {birthYear - 3} and {birthYear + 3}.
+                  </div>
+
+                  {/* Timeline */}
+                  <div style={{position:"relative", paddingLeft:20, borderLeft:"2px solid var(--rule)"}}>
                     {lifeStages.map((s, i) => (
                       <div key={i} style={{
-                        display:"grid", gridTemplateColumns:"90px 1fr",
-                        padding:"10px 0",
-                        borderBottom: i < lifeStages.length - 1 ? "1px solid var(--rule)" : "none",
-                        alignItems:"baseline",
+                        position:"relative", paddingBottom: i < lifeStages.length - 1 ? 20 : 0,
+                        animation: `fadeIn 400ms ${i * 120}ms both`,
                       }}>
-                        <div style={{fontFamily:"var(--mono)", fontSize:11, fontWeight:700, color:"var(--ink)", letterSpacing:"0.04em"}}>
-                          {s.age}
-                        </div>
-                        <div>
-                          <span style={{fontFamily:"var(--serif)", fontSize:14, color:"var(--vellum-dim)"}}>
-                            {s.label}{" "}
+                        {/* Timeline dot */}
+                        <div style={{
+                          position:"absolute", left:-27, top:4, width:12, height:12,
+                          borderRadius:"50%", background:"var(--bg)", border:"2px solid var(--ink)",
+                          display:"flex", alignItems:"center", justifyContent:"center",
+                          fontSize:7, color:"var(--ink)",
+                        }} />
+                        <div style={{marginLeft:8}}>
+                          <span style={{fontFamily:"var(--mono)", fontSize:12, fontWeight:700, color:"var(--ink)"}}>
+                            {s.age}
                           </span>
-                          <span style={{fontFamily:"var(--display)", fontSize:18, fontWeight:600, color:"var(--ink)", letterSpacing:"-0.01em"}}>
-                            {s.names.join(", ")}
+                          <span style={{fontFamily:"var(--serif)", fontSize:14.5, color:"var(--vellum-dim)", marginLeft:6}}>
+                            — {s.label}
                           </span>
-                          <span style={{fontFamily:"var(--mono)", fontSize:9, color:"var(--muted)", marginLeft:8}}>
+                          <div style={{fontFamily:"var(--display)", fontSize:22, fontWeight:600, color:"var(--ink)", letterSpacing:"-0.01em", marginTop:2}}>
+                            {s.names.join(", ")}.
+                          </div>
+                          <div style={{fontFamily:"var(--mono)", fontSize:9, color:"var(--muted)", marginTop:2}}>
                             {s.note}
-                          </span>
+                          </div>
                         </div>
                       </div>
                     ))}
+                  </div>
+
+                  <div style={{fontFamily:"var(--serif)", fontStyle:"italic", fontSize:13, color:"var(--muted)", marginTop:20, borderTop:"1px solid var(--rule)", paddingTop:14, lineHeight:1.55}}>
+                    All of this is derived from public SSA data. None of it is about you specifically. All of it is probably a little too accurate.
                   </div>
                 </div>
               )}
