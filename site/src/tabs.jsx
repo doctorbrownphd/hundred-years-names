@@ -733,13 +733,19 @@ function TabValidation({ accent }) {
           </thead>
           <tbody>
             {_VALID.map(v => (
-              <tr key={v.event}>
+              <tr key={v.event} style={{opacity: v.detected ? 1 : 0.55}}>
                 <td>{v.event}</td>
                 <td className="num">{v.year}</td>
-                <td style={{fontStyle:"italic"}}>{v.name}</td>
-                <td style={{fontStyle:"italic", color:"var(--vellum-dim)"}}>{v.expected}</td>
-                <td className="delta">{v.delta}</td>
-                <td className="check">● confirmed</td>
+                <td style={{fontStyle:"italic", fontWeight:500}}>{v.name}</td>
+                <td style={{fontStyle:"italic", color:"var(--vellum-dim)"}}>
+                  {v.expected === "surge" ? "↑ surge" : v.expected === "collapse" ? "↓ collapse" : v.expected}
+                </td>
+                <td className="delta" style={{color: v.delta && v.delta.startsWith("+") ? "var(--moss)" : v.delta && v.delta.startsWith("-") ? "var(--highlight)" : "var(--muted)"}}>
+                  {v.delta || "—"}
+                </td>
+                <td className={v.detected ? "check" : "miss"}>
+                  {v.detected ? "● confirmed" : "○ not detected"}
+                </td>
               </tr>
             ))}
           </tbody>
