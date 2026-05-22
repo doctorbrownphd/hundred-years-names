@@ -5,7 +5,7 @@
   --ink:        #1B2A4A;
   --ink-2:      #253659;
   --ink-3:      #2F4068;
-  --rule:       #D5CFC3;
+  --rule:       #DDDFE4;
   --vellum:     #1B2A4A;
   --vellum-dim: #6B7B8D;
   --muted:      #9BA5AF;
@@ -19,17 +19,17 @@
   --bronze:     #C4897A;
   --tan:        #9BA5AF;
 
-  --bg:         #F5F0E8;
-  --panel:      #EDE8DE;
+  --bg:         #FAFAFC;
+  --panel:      #F2F3F6;
 
-  --era-classic:       #D4C5A0;
-  --era-hollywood:     #C9A87A;
-  --era-suburban:      #B5C4A0;
-  --era-individuality: #A0B5C4;
-  --era-unique:        #C4A0B5;
-  --era-flash:         #C4897A;
-  --era-killed:        #9BA5AF;
-  --era-steady:        #D5CFC3;
+  --era-classic:       #8B9DC3;
+  --era-hollywood:     #C48B7A;
+  --era-suburban:      #7BAF8B;
+  --era-individuality: #9B8BC4;
+  --era-unique:        #5B9EAF;
+  --era-flash:         #C4697A;
+  --era-killed:        #8B95A5;
+  --era-steady:        #A5ADBA;
 
   --serif:    "Libre Baskerville", "Iowan Old Style", Georgia, serif;
   --display:  "Cormorant Garamond", "Playfair Display", Georgia, serif;
@@ -50,15 +50,13 @@ html, body {
 }
 body { min-height: 100vh; }
 
-/* Subtle warm paper grain */
+/* Subtle cool grain */
 body::before {
   content: "";
   position: fixed; inset: 0;
   background-image:
-    radial-gradient(rgba(180,165,140,0.06) 1px, transparent 1px),
-    radial-gradient(rgba(160,145,120,0.04) 1px, transparent 1px);
-  background-size: 4px 4px, 7px 7px;
-  background-position: 0 0, 2px 2px;
+    radial-gradient(rgba(27,42,74,0.03) 1px, transparent 1px);
+  background-size: 3px 3px;
   pointer-events: none;
   z-index: 100;
 }
@@ -479,7 +477,7 @@ a:hover { color: var(--highlight); border-bottom-color: var(--highlight); }
 .heatmap-legend .grad {
   width: 180px; height: 8px;
   border-radius: 2px;
-  background: linear-gradient(to right, #EDE8DE, #C9A87A, #1B2A4A, #0D1829);
+  background: linear-gradient(to right, #F2F3F6, #A0B5C4, #1B2A4A, #0D1829);
 }
 
 /* === Filters === */

@@ -17,7 +17,12 @@ function TabSearch({ accent }) {
   const suggestions = ["Jennifer","Mary","Linda","Michael","Ashley","Khaleesi","Alexa","Emma","James","Karen"];
   const featuredNames = ["Jennifer","Emma","Khaleesi","Ashley","James"];
 
-  const found = query.trim() ? _NI[query.trim().toLowerCase()] : null;
+  const found = React.useMemo(() => {
+    if (!query.trim()) return null;
+    const q = query.trim().toLowerCase();
+    // Try exact match, then with _f, then with _m (prefer the more common gender)
+    return _NI[q] || _NI[q + "_f"] || _NI[q + "_m"] || _NI[q + "_F"] || _NI[q + "_M"] || null;
+  }, [query]);
 
   const annotations = React.useMemo(() => {
     if (!found) return [];
@@ -96,7 +101,7 @@ function TabSearch({ accent }) {
           </div>
           <div className="yourname-cards">
             {featuredNames.map(nm => {
-              const n = _NI[nm.toLowerCase()];
+              const q = nm.toLowerCase(); const n = _NI[q] || _NI[q+"_f"] || _NI[q+"_m"];
               if (!n) return null;
               return (
                 <div key={nm} className="yourname-card" onClick={() => setQuery(nm)}>
