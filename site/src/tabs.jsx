@@ -44,7 +44,7 @@ function TabSearch({ accent }) {
   const annotations = React.useMemo(() => {
     if (!found) return [];
     if (found.name === "Jennifer") return [
-      { year: 1970, label: "\u201CLove Story\u201D released", up: true },
+      { year: 1970, label: "“Love Story” released", up: true },
       { year: 1972, label: "#1 in U.S.", up: false },
       { year: 2000, label: "Drops out of top 50", up: true },
     ];
@@ -58,7 +58,7 @@ function TabSearch({ accent }) {
     ];
     if (found.name === "Emma") return [
       { year: 1880, label: "Victorian peak", up: true },
-      { year: 1994, label: "\u201CFriends\u201D premiere", up: false },
+      { year: 1994, label: "“Friends” premiere", up: false },
       { year: 2018, label: "Modern peak", up: true },
     ];
     if (found.name === "Linda") return [{ year: 1947, label: "Post-war surge", up: true }];
@@ -78,13 +78,13 @@ function TabSearch({ accent }) {
   const stronghold = React.useMemo(() => {
     if (!found) return null;
     const map = {
-      Jennifer:"California (1.34\u00d7 nat\u2019l)", Linda:"Pennsylvania (1.22\u00d7)",
-      Mary:"Massachusetts (1.41\u00d7)", James:"Texas (1.18\u00d7)",
-      Michael:"New York (1.27\u00d7)", Ashley:"Tennessee (1.31\u00d7)",
-      Khaleesi:"Texas (1.55\u00d7)", Alexa:"Florida (1.19\u00d7)",
-      Emma:"Vermont (1.44\u00d7)", Karen:"Iowa (1.62\u00d7)",
+      Jennifer:"California (1.34× nat’l)", Linda:"Pennsylvania (1.22×)",
+      Mary:"Massachusetts (1.41×)", James:"Texas (1.18×)",
+      Michael:"New York (1.27×)", Ashley:"Tennessee (1.31×)",
+      Khaleesi:"Texas (1.55×)", Alexa:"Florida (1.19×)",
+      Emma:"Vermont (1.44×)", Karen:"Iowa (1.62×)",
     };
-    return map[found.name] || "California (1.12\u00d7)";
+    return map[found.name] || "California (1.12×)";
   }, [found]);
 
   // No query yet — show the centered hero search
@@ -92,11 +92,11 @@ function TabSearch({ accent }) {
     return (
       <div>
         <div className="yourname-hero">
-          <div className="search-prefix">Search 105,182 names \u00b7 1880\u20132024</div>
+          <div className="search-prefix">Search 105,182 names · 1880–2024</div>
           <div className="search-input-wrap">
             <input className="search-input" autoFocus
                    value={query} onChange={e => setQuery(e.target.value)}
-                   placeholder="type your name\u2026" />
+                   placeholder="type your name…" />
           </div>
           <div className="search-suggest" style={{marginTop:16, justifyContent:"center"}}>
             <span style={{fontFamily:"var(--mono)", fontSize:"10px", letterSpacing:"0.16em", color:"var(--muted)", textTransform:"uppercase"}}>Try</span>
@@ -106,7 +106,7 @@ function TabSearch({ accent }) {
           </div>
           {query.trim() && !found && (
             <p style={{fontFamily:"var(--serif)", fontStyle:"italic", color:"var(--muted)", marginTop:24}}>
-              No record of \u201C{query}\u201D in the SSA corpus (names with fewer than 5 occurrences in any year are omitted).
+              No record of “{query}” in the SSA corpus (names with fewer than 5 occurrences in any year are omitted).
             </p>
           )}
         </div>
@@ -118,14 +118,14 @@ function TabSearch({ accent }) {
           </div>
           <div className="yourname-cards">
             {featuredNames.map(nm => {
-              const q = nm.toLowerCase(); const n = _NI[q] || _NI[q+"_f"] || _NI[q+"_m"];
+              const q = nm.toLowerCase(); const n = _NI[q] || _NI[q+"_F"] || _NI[q+"_M"];
               if (!n) return null;
               return (
                 <div key={nm} className="yourname-card" onClick={() => setQuery(nm)}>
                   <div className="card-name">{n.name}</div>
-                  <div className="card-era">{n.era} \u00b7 {n.gender === "F" ? "F" : n.gender === "M" ? "M" : "X"}</div>
+                  <div className="card-era">{n.era} · {n.gender === "F" ? "F" : n.gender === "M" ? "M" : "X"}</div>
                   <Sparkline data={n.yearly} width={160} height={32} color={accent} fill peak={false} />
-                  <div className="card-peak">Peak {n.peakYear} \u00b7 {n.peakRate.toFixed(1)}/1k</div>
+                  <div className="card-peak">Peak {n.peakYear} · {n.peakRate.toFixed(1)}/1k</div>
                 </div>
               );
             })}
@@ -139,11 +139,11 @@ function TabSearch({ accent }) {
   return (
     <div>
       <div className="section" style={{marginTop:0}}>
-        <div className="search-prefix">Search \u00b7 105,182 names</div>
+        <div className="search-prefix">Search · 105,182 names</div>
         <div className="search-input-wrap">
           <input className="search-input" autoFocus
                  value={query} onChange={e => setQuery(e.target.value)}
-                 placeholder="type a name\u2026"
+                 placeholder="type a name…"
                  style={{textAlign:"left", fontSize:48}} />
         </div>
         <div className="search-suggest">
@@ -158,7 +158,7 @@ function TabSearch({ accent }) {
             <div style={{display:"flex", alignItems:"baseline", gap:18, marginBottom:6}}>
               <h2 style={{fontFamily:"var(--display)", fontSize:64, fontWeight:600, margin:0, letterSpacing:"-0.015em", color:"var(--ink)"}}>{found.name}</h2>
               <span style={{fontFamily:"var(--mono)", fontSize:11, color:"var(--muted)", letterSpacing:"0.14em", textTransform:"uppercase"}}>
-                {found.gender === "F" ? "Female-led" : found.gender === "M" ? "Male-led" : "Mixed"} \u00b7 {found.era}
+                {found.gender === "F" ? "Female-led" : found.gender === "M" ? "Male-led" : "Mixed"} · {found.era}
               </span>
             </div>
             <div style={{fontFamily:"var(--serif)", fontStyle:"italic", fontSize:18, color:"var(--vellum-dim)", marginBottom:18}}>
@@ -183,7 +183,7 @@ function TabSearch({ accent }) {
                 </div>
                 <div className="nrs-item">
                   <div className="nrs-label">Half-life</div>
-                  <div className="nrs-value">{found.halfLife ?? "\u2014"}<span style={{fontFamily:"var(--mono)",fontSize:"10px",color:"var(--muted)",marginLeft:4}}>yr</span></div>
+                  <div className="nrs-value">{found.halfLife ?? "—"}<span style={{fontFamily:"var(--mono)",fontSize:"10px",color:"var(--muted)",marginLeft:4}}>yr</span></div>
                 </div>
                 <div className="nrs-item">
                   <div className="nrs-label">Curve type</div>
@@ -197,11 +197,11 @@ function TabSearch({ accent }) {
 
               <p className="search-narrative">
                 <em>{found.name}</em> peaked in {found.peakYear} at {found.peakRate.toFixed(2)} per
-                thousand babies \u2014 meaning that of every {Math.round(1000/Math.max(found.peakRate, 0.001))} born
+                thousand babies — meaning that of every {Math.round(1000/Math.max(found.peakRate, 0.001))} born
                 that year, one was named {found.name}. {narrate(found).split(". ").slice(1).join(". ")}
               </p>
               <p className="search-narrative">
-                By 2024, the rate has settled to {found.currentRate.toFixed(2)} per thousand \u2014
+                By 2024, the rate has settled to {found.currentRate.toFixed(2)} per thousand —
                 a {found.peakRate > 0 ? Math.round((1 - found.currentRate/found.peakRate)*100) : 0}% decline from peak.
                 Belongs to <em>{eraLabel(found.era)}</em> alongside {related.slice(0,3).map(r => r.name).join(", ")}.
               </p>
@@ -213,8 +213,8 @@ function TabSearch({ accent }) {
               <h4>Numbers</h4>
               <div className="rel"><span className="nm">Peak year</span><span className="v">{found.peakYear}</span></div>
               <div className="rel"><span className="nm">Peak rate</span><span className="v">{found.peakRate.toFixed(2)}/1k</span></div>
-              <div className="rel"><span className="nm">Rise time</span><span className="v">{found.riseTime ?? "\u2014"} yr</span></div>
-              <div className="rel"><span className="nm">Half-life</span><span className="v">{found.halfLife ?? "\u2014"} yr</span></div>
+              <div className="rel"><span className="nm">Rise time</span><span className="v">{found.riseTime ?? "—"} yr</span></div>
+              <div className="rel"><span className="nm">Half-life</span><span className="v">{found.halfLife ?? "—"} yr</span></div>
               <div className="rel"><span className="nm">Current rate</span><span className="v">{found.currentRate.toFixed(2)}/1k</span></div>
               <div className="rel"><span className="nm">Stronghold</span><span className="v" style={{fontFamily:"var(--serif)", fontStyle:"italic"}}>{stronghold}</span></div>
             </section>
@@ -252,9 +252,9 @@ function TabWaves({ accent }) {
     <div>
       <div className="section" style={{marginTop:0}}>
         <div className="section-head">
-          <div className="label">\u00a7 II \u00b7 Co-Occurrence</div>
+          <div className="label">§ II · Co-Occurrence</div>
           <div className="rule" />
-          <div className="aside">Detected naming waves \u00b7 144-yr window</div>
+          <div className="aside">Detected naming waves · 144-yr window</div>
         </div>
         <h2 className="section-title">Names that rise together, die together.</h2>
         <p className="section-lede">
@@ -265,7 +265,7 @@ function TabWaves({ accent }) {
 
         <div className="waves-list">
           {_WAVES.map(w => {
-            const samples = w.names.map(nm => _NI[nm.toLowerCase()] || _NI[nm.toLowerCase()+"_f"] || _NI[nm.toLowerCase()+"_m"]).filter(Boolean);
+            const samples = w.names.map(nm => _NI[nm.toLowerCase()] || _NI[nm.toLowerCase()+"_F"] || _NI[nm.toLowerCase()+"_M"]).filter(Boolean);
             return (
               <div className="wave-card" key={w.id}>
                 <div className="yr">
@@ -274,7 +274,7 @@ function TabWaves({ accent }) {
                 </div>
                 <div className="body">
                   <div className="ttl">{w.label}</div>
-                  <div className="nm">{w.names.join(" \u00b7 ")}</div>
+                  <div className="nm">{w.names.join(" · ")}</div>
                   <div className="note">{w.note}</div>
                 </div>
                 <div>
@@ -307,20 +307,20 @@ function TabEra({ accent }) {
     .slice(0, 60);
 
   const _q = selected.toLowerCase();
-  const sel = _NI[_q] || _NI[_q+"_f"] || _NI[_q+"_m"];
+  const sel = _NI[_q] || _NI[_q+"_F"] || _NI[_q+"_M"];
 
   return (
     <div>
       <div className="section" style={{marginTop:0}}>
         <div className="section-head">
-          <div className="label">\u00a7 III \u00b7 Era Vocabulary</div>
+          <div className="label">§ III · Era Vocabulary</div>
           <div className="rule" />
-          <div className="aside">60 names \u00d7 15 decades \u00b7 rate per 1k</div>
+          <div className="aside">60 names × 15 decades · rate per 1k</div>
         </div>
         <h2 className="section-title">The sound of a decade, in heat.</h2>
         <p className="section-lede">
           Rows are names, sorted by peak decade. Columns are decades. Brightness is rate.
-          Eras emerge as diagonal bands \u2014 proof that names cluster, that decades have a voice,
+          Eras emerge as diagonal bands — proof that names cluster, that decades have a voice,
           that you can hear a generation in the cells of a table.
         </p>
 
@@ -354,8 +354,8 @@ function TabEra({ accent }) {
             <div className="stats">
               <div><div className="k">Peak year</div><div className="v">{sel.peakYear}</div></div>
               <div><div className="k">Peak rate</div><div className="v">{(sel.peakRate||0).toFixed(2)}<span style={{fontFamily:"var(--mono)",fontSize:"10px",color:"var(--muted)",marginLeft:4}}>/1k</span></div></div>
-              <div><div className="k">Rise time</div><div className="v">{sel.riseTime ?? "\u2014"}<span style={{fontFamily:"var(--mono)",fontSize:"10px",color:"var(--muted)",marginLeft:4}}>yr</span></div></div>
-              <div><div className="k">Half-life</div><div className="v">{sel.halfLife ?? "\u2014"}<span style={{fontFamily:"var(--mono)",fontSize:"10px",color:"var(--muted)",marginLeft:4}}>yr</span></div></div>
+              <div><div className="k">Rise time</div><div className="v">{sel.riseTime ?? "—"}<span style={{fontFamily:"var(--mono)",fontSize:"10px",color:"var(--muted)",marginLeft:4}}>yr</span></div></div>
+              <div><div className="k">Half-life</div><div className="v">{sel.halfLife ?? "—"}<span style={{fontFamily:"var(--mono)",fontSize:"10px",color:"var(--muted)",marginLeft:4}}>yr</span></div></div>
             </div>
             <p>{narrate(sel)}</p>
           </aside>}
@@ -364,12 +364,12 @@ function TabEra({ accent }) {
 
       <div className="section">
         <div className="section-head">
-          <div className="label">\u00a7 III.b \u00b7 Sound Shifts</div>
+          <div className="label">§ III.b · Sound Shifts</div>
           <div className="rule" />
-          <div className="aside">Suffix frequency \u00b7 small multiples</div>
+          <div className="aside">Suffix frequency · small multiples</div>
         </div>
         <p className="section-lede">
-          Names don't rise alone. They rise as phonetic cohorts \u2014
+          Names don't rise alone. They rise as phonetic cohorts —
           a suffix becomes fashionable, then exhausts itself in a single generation.
         </p>
         <div className="smallmult">
@@ -394,12 +394,12 @@ function narrate(n) {
     return `${n.name} did not exist in the SSA record before ${n.peakYear - 2}. Its appearance is the cleanest kind of cultural signature: a name that owes its entire history to a single trigger.`;
   }
   if (n.era === "killed") {
-    return `${n.name} peaked at ${n.peakRate.toFixed(2)} per thousand in ${n.peakYear}, then collapsed. The half-life after the kill event was ${n.halfLife} years \u2014 among the fastest decays in the corpus.`;
+    return `${n.name} peaked at ${n.peakRate.toFixed(2)} per thousand in ${n.peakYear}, then collapsed. The half-life after the kill event was ${n.halfLife} years — among the fastest decays in the corpus.`;
   }
   if (n.era === "steady" || !n.halfLife) {
-    return `${n.name} is one of the corpus's steadies \u2014 a name that has never peaked sharply and has never disappeared. It anchors the dataset.`;
+    return `${n.name} is one of the corpus's steadies — a name that has never peaked sharply and has never disappeared. It anchors the dataset.`;
   }
-  return `${n.name} peaked in ${n.peakYear} at ${n.peakRate.toFixed(2)} per thousand. Roughly ${total} American babies received this name in its peak year alone. The decay follows a clean half-life of ${n.halfLife} years \u2014 the canonical wave shape.`;
+  return `${n.name} peaked in ${n.peakYear} at ${n.peakRate.toFixed(2)} per thousand. Roughly ${total} American babies received this name in its peak year alone. The decay follows a clean half-life of ${n.halfLife} years — the canonical wave shape.`;
 }
 
 // ====================================================================
@@ -433,9 +433,9 @@ function TabGeo({ accent }) {
     <div>
       <div className="section" style={{marginTop:0}}>
         <div className="section-head">
-          <div className="label">\u00a7 IV \u00b7 Geography</div>
+          <div className="label">§ IV · Geography</div>
           <div className="rule" />
-          <div className="aside">Trendsetter & lag \u00b7 12 states shown</div>
+          <div className="aside">Trendsetter & lag · 12 states shown</div>
         </div>
         <h2 className="section-title">Names travel coast to interior.</h2>
         <p className="section-lede">
@@ -457,8 +457,8 @@ function TabGeo({ accent }) {
                   </text>
                 </g>
               ))}
-              <text x={xs(-3)} y={H - 2} textAnchor="middle" className="axis-text" style={{letterSpacing:"0.12em"}}>\u2190 LEADS</text>
-              <text x={xs(3)} y={H - 2} textAnchor="middle" className="axis-text" style={{letterSpacing:"0.12em"}}>LAGS \u2192</text>
+              <text x={xs(-3)} y={H - 2} textAnchor="middle" className="axis-text" style={{letterSpacing:"0.12em"}}>← LEADS</text>
+              <text x={xs(3)} y={H - 2} textAnchor="middle" className="axis-text" style={{letterSpacing:"0.12em"}}>LAGS →</text>
 
               {states.map((s, i) => {
                 const isLead = s.lead < 0;
@@ -495,18 +495,18 @@ function TabGeo({ accent }) {
             <p>
               California and New York lead the national naming trend by an average of
               <em style={{color:"var(--ink)"}}> 3.6 years</em>. Southern and Plains states lag by
-              <em style={{color:"var(--ink)"}}> 4\u20135</em>. The same map you would draw for any cultural
-              good \u2014 magazines, music, slang \u2014 drawn here from birth certificates alone.
+              <em style={{color:"var(--ink)"}}> 4–5</em>. The same map you would draw for any cultural
+              good — magazines, music, slang — drawn here from birth certificates alone.
             </p>
             <p>
-              The exception is the Hispanic-name corridor \u2014 <em style={{color:"var(--ink)"}}>Sof\u00eda, Mateo, Santiago</em> \u2014
+              The exception is the Hispanic-name corridor — <em style={{color:"var(--ink)"}}>Sofía, Mateo, Santiago</em> —
               which leads in Texas, California, Florida simultaneously, breaking the
               coastal pattern entirely.
             </p>
             <p>
               Regionality is measured as a Gini coefficient over state shares.
               <em style={{color:"var(--ink)"}}> Bubba</em> is the corpus's most regional name
-              (0.91 \u2014 almost all Southern). <em style={{color:"var(--ink)"}}>Michael</em>, the least (0.04 \u2014 perfectly uniform).
+              (0.91 — almost all Southern). <em style={{color:"var(--ink)"}}>Michael</em>, the least (0.04 — perfectly uniform).
             </p>
           </aside>
         </div>
@@ -525,7 +525,7 @@ function TabArchetypes({ accent }) {
       desc:"Sharp peak, 1970s. Half-life under 20 years. The most cohesive cohort in the corpus." },
     { id:"aidens",    label:"The Aidens",      n: 412,  color:"var(--era-individuality)",
       top:["Aiden","Jayden","Brayden","Kayden","Hayden"],
-      desc:"Phonetic cluster. Vowel-D-vowel-N. Peaks 2005\u20132015. The sound of the 2010s boy." },
+      desc:"Phonetic cluster. Vowel-D-vowel-N. Peaks 2005–2015. The sound of the 2010s boy." },
     { id:"revivals",  label:"The Revivals",    n: 86,   color:"var(--era-hollywood)",
       top:["Emma","Olivia","Charlotte","Hazel","Eleanor"],
       desc:"Victorian names that died around 1920 and returned after 2000. Two peaks, century apart." },
@@ -537,27 +537,27 @@ function TabArchetypes({ accent }) {
       desc:"<5-year peak-to-gone. Owe their entire history to a single cultural trigger." },
     { id:"hollywood", label:"The Hollywoods",  n: 156,  color:"var(--era-classic)",
       top:["Shirley","Marilyn","Judy","Gary","Donna"],
-      desc:"Celebrity-driven peaks, 1930s\u20131950s. First wave of trigger-driven naming." },
+      desc:"Celebrity-driven peaks, 1930s–1950s. First wave of trigger-driven naming." },
   ];
 
   return (
     <div>
       <div className="section" style={{marginTop:0}}>
         <div className="section-head">
-          <div className="label">\u00a7 V \u00b7 Archetypes</div>
+          <div className="label">§ V · Archetypes</div>
           <div className="rule" />
-          <div className="aside">UMAP on 144-dim profile \u00b7 HDBSCAN</div>
+          <div className="aside">UMAP on 144-dim profile · HDBSCAN</div>
         </div>
         <h2 className="section-title">Names travel in packs.</h2>
         <p className="section-lede">
           Project every name into its 144-dimensional yearly-rate vector. Reduce.
-          Cluster. Six archetypes survive parameter sweeps \u2014 six distinct shapes a
+          Cluster. Six archetypes survive parameter sweeps — six distinct shapes a
           naming life can take.
         </p>
 
         <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:0, background:"var(--panel)", borderRadius:6, boxShadow:"0 1px 4px rgba(27,42,74,0.06), 0 0 0 1px rgba(213,207,195,0.5)"}}>
           {archetypes.map((a, i) => {
-            const sample = _NI[a.top[0].toLowerCase()] || _NI[a.top[0].toLowerCase()+"_f"] || _NI[a.top[0].toLowerCase()+"_m"] || _ND[0];
+            const sample = _NI[a.top[0].toLowerCase()] || _NI[a.top[0].toLowerCase()+"_F"] || _NI[a.top[0].toLowerCase()+"_M"] || _ND[0];
             const col = i % 3, row = Math.floor(i / 3);
             return (
               <div key={a.id} style={{
@@ -577,7 +577,7 @@ function TabArchetypes({ accent }) {
                 </div>
                 <Sparkline data={sample.yearly} width={220} height={36} color={accent} fill />
                 <div style={{fontFamily:"var(--serif)", fontStyle:"italic", fontSize:"13.5px", color:"var(--muted)", marginTop:10}}>
-                  {a.top.join(" \u00b7 ")}
+                  {a.top.join(" · ")}
                 </div>
               </div>
             );
@@ -596,13 +596,13 @@ function TabValidation({ accent }) {
     <div>
       <div className="section" style={{marginTop:0}}>
         <div className="section-head">
-          <div className="label">\u00a7 VI \u00b7 Validation</div>
+          <div className="label">§ VI · Validation</div>
           <div className="rule" />
-          <div className="aside">Cultural events \u2192 detected signal</div>
+          <div className="aside">Cultural events → detected signal</div>
         </div>
         <h2 className="section-title">Do the findings hold up?</h2>
         <p className="section-lede">
-          The pipeline runs blind. Validation happens after \u2014 we list cultural events
+          The pipeline runs blind. Validation happens after — we list cultural events
           with predicted name impact, then check whether the wave / trigger / kill detectors
           fired independently. Ten events tested. Ten detected.
         </p>
@@ -614,7 +614,7 @@ function TabValidation({ accent }) {
               <th style={{width:"10%"}}>Year</th>
               <th style={{width:"14%"}}>Name</th>
               <th style={{width:"16%"}}>Expected</th>
-              <th style={{width:"14%"}}>\u0394 rate</th>
+              <th style={{width:"14%"}}>Δ rate</th>
               <th style={{width:"12%"}}>Detected</th>
             </tr>
           </thead>
@@ -626,7 +626,7 @@ function TabValidation({ accent }) {
                 <td style={{fontStyle:"italic"}}>{v.name}</td>
                 <td style={{fontStyle:"italic", color:"var(--vellum-dim)"}}>{v.expected}</td>
                 <td className="delta">{v.delta}</td>
-                <td className="check">\u25cf confirmed</td>
+                <td className="check">● confirmed</td>
               </tr>
             ))}
           </tbody>
@@ -634,8 +634,8 @@ function TabValidation({ accent }) {
 
         <p style={{fontFamily:"var(--serif)", fontStyle:"italic", color:"var(--muted)", marginTop:18, fontSize:14, maxWidth:680}}>
           The Shirley Temple, Linda, Jennifer, Diana, Emma, Katrina, Khaleesi, Elsa, Alexa, and Karen
-          findings each fall out of an independent detector \u2014 wave clustering, trigger detection,
-          kill detection \u2014 without any of them being told to look for the event.
+          findings each fall out of an independent detector — wave clustering, trigger detection,
+          kill detection — without any of them being told to look for the event.
           Three methods, ten events, no false negatives.
         </p>
       </div>
@@ -651,23 +651,23 @@ function TabOverview({ accent }) {
   const [eraFilter, setEraFilter] = React.useState(null);
 
   const stats = [
-    { label: "Unique names \u00b7 1880\u20132024",  value: "105,182",  unit: "",
+    { label: "Unique names · 1880–2024",  value: "105,182",  unit: "",
       foot: "after merging gender variants",
       spark: _DIV.map(d => d.uniqueNames) },
     { label: "Years of record",            value: "144",      unit: "yr",
-      foot: "1880 \u2192 2024, continuous",
+      foot: "1880 → 2024, continuous",
       spark: _YEARS.map((_,i) => i) },
     { label: "Peak concentration",         value: "32",       unit: "%",
-      foot: "top 10 names \u00b7 1947",
+      foot: "top 10 names · 1947",
       spark: _DIV.map(d => d.top10Share) },
     { label: "Today's concentration",      value: "8.1",      unit: "%",
-      foot: "top 10 names \u00b7 2024",
+      foot: "top 10 names · 2024",
       spark: _DIV.map(d => d.top10Share).slice().reverse() },
     { label: "Cultural eras detected",     value: "5",        unit: "",
       foot: "HDBSCAN, min cluster 80",
       spark: [3,4,4,5,5,5,5,6,5,5] },
     { label: "Gender-crossed names",       value: "1,872",    unit: "",
-      foot: "Ashley, Leslie, Avery, \u2026",
+      foot: "Ashley, Leslie, Avery, …",
       spark: [12,18,28,42,68,121,210,340,510,720] },
   ];
 
@@ -675,7 +675,7 @@ function TabOverview({ accent }) {
     <div>
       <div className="section">
         <div className="section-head">
-          <div className="label">\u00a7 I \u00b7 The Thesis</div>
+          <div className="label">§ I · The Thesis</div>
           <div className="rule" />
           <div className="aside">Six numbers, one century</div>
         </div>
@@ -696,14 +696,14 @@ function TabOverview({ accent }) {
 
       <div className="section">
         <div className="section-head">
-          <div className="label">\u00a7 II \u00b7 The Landscape</div>
+          <div className="label">§ II · The Landscape</div>
           <div className="rule" />
-          <div className="aside">Top 26 names \u00b7 stacked \u00b7 rate per 1k</div>
+          <div className="aside">Top 26 names · stacked · rate per 1k</div>
         </div>
         <h2 className="section-title">A century of taste, in one image.</h2>
         <p className="section-lede">
           Every band is a name. Width is the rate per thousand babies. The shape itself
-          is the argument: a few dominant ridges before 1960, then an explosion of fine bands \u2014
+          is the argument: a few dominant ridges before 1960, then an explosion of fine bands —
           the same number of babies, redistributed across thousands more names.
         </p>
 
@@ -728,33 +728,33 @@ function TabOverview({ accent }) {
               today's top 1,000 combined.
             </p>
             <div className="pull">
-              The naming landscape has been flattening for sixty years \u2014
+              The naming landscape has been flattening for sixty years —
               a quiet, uncoordinated revolt against conformity.
             </div>
             <p>
               The bands you see thinning after 1970 are not names disappearing.
               They are the same parents, choosing differently.
             </p>
-            <p className="cite">Source \u00b7 SSA Actuarial \u00b7 2.1M rows</p>
+            <p className="cite">Source · SSA Actuarial · 2.1M rows</p>
           </aside>
         </div>
       </div>
 
       <div className="section">
         <div className="section-head">
-          <div className="label">\u00a7 III \u00b7 The Eras</div>
+          <div className="label">§ III · The Eras</div>
           <div className="rule" />
-          <div className="aside">Discovered by clustering \u00b7 not assigned</div>
+          <div className="aside">Discovered by clustering · not assigned</div>
         </div>
         <div className="ribbon">
           {_ERAS.map(e => (
             <div className="era" key={e.id} onClick={() => setEraFilter(eraFilter === e.id ? null : e.id)}
                  style={{cursor:"pointer"}}>
               <div className="bar" style={{background: e.color}} />
-              <div className="yr">{e.years[0]}\u2013{e.years[1]}</div>
+              <div className="yr">{e.years[0]}–{e.years[1]}</div>
               <div className="name">{e.label.replace("The ","")}</div>
               <div className="desc">{e.tagline}</div>
-              <div className="keys">{e.keyNames.slice(0, 5).join(" \u00b7 ")}</div>
+              <div className="keys">{e.keyNames.slice(0, 5).join(" · ")}</div>
             </div>
           ))}
         </div>
@@ -762,22 +762,22 @@ function TabOverview({ accent }) {
 
       <div className="section">
         <div className="section-head">
-          <div className="label">\u00a7 IV \u00b7 Three Names</div>
+          <div className="label">§ IV · Three Names</div>
           <div className="rule" />
-          <div className="aside">Wave \u00b7 Crossover \u00b7 Trigger</div>
+          <div className="aside">Wave · Crossover · Trigger</div>
         </div>
         <h2 className="section-title">Three names tell three stories.</h2>
 
         <div className="triple">
           {[
-            { tag: "The Wave",      name: "Jennifer",  by: "dormant 1938 \u00b7 #1 in 1972 \u00b7 near-zero 2024",
+            { tag: "The Wave",      name: "Jennifer",  by: "dormant 1938 · #1 in 1972 · near-zero 2024",
               nums: [["peak","1972"],["rate","5.6/k"],["half-life","14 yr"]] },
-            { tag: "The Crossover", name: "Ashley",    by: "male in 1900 \u00b7 female by 1985",
+            { tag: "The Crossover", name: "Ashley",    by: "male in 1900 · female by 1985",
               nums: [["crossover","1968"],["peak","1987"],["current","1.9% M"]] },
-            { tag: "The Trigger",   name: "Khaleesi",  by: "first recorded in 2011 \u00b7 Game of Thrones",
-              nums: [["debut","2011"],["peak","2013"],["born","\u223c560"]] },
+            { tag: "The Trigger",   name: "Khaleesi",  by: "first recorded in 2011 · Game of Thrones",
+              nums: [["debut","2011"],["peak","2013"],["born","∼560"]] },
           ].map((f, i) => {
-            const n = _NI[f.name.toLowerCase()] || _NI[f.name.toLowerCase()+"_f"] || _NI[f.name.toLowerCase()+"_m"];
+            const n = _NI[f.name.toLowerCase()] || _NI[f.name.toLowerCase()+"_F"] || _NI[f.name.toLowerCase()+"_M"];
             return (
               <div className="feat" key={i}>
                 <div className="tag">{f.tag}</div>
@@ -801,9 +801,9 @@ function TabOverview({ accent }) {
 
       <div className="section">
         <div className="section-head">
-          <div className="label">\u00a7 V \u00b7 Pipeline</div>
+          <div className="label">§ V · Pipeline</div>
           <div className="rule" />
-          <div className="aside">10 stages \u00b7 6m 41s total \u00b7 reproducible</div>
+          <div className="aside">10 stages · 6m 41s total · reproducible</div>
         </div>
         <div className="pipeline">
           {_PIPELINE.map(p => (
@@ -811,7 +811,7 @@ function TabOverview({ accent }) {
               <div className="id">{p.id}</div>
               <div className="nm">{p.name}</div>
               <div className="ds">{p.desc}</div>
-              <div className="rt">{p.rows}<span className="sep">\u00b7</span>{p.time}</div>
+              <div className="rt">{p.rows}<span className="sep">·</span>{p.time}</div>
             </div>
           ))}
         </div>
@@ -819,21 +819,21 @@ function TabOverview({ accent }) {
 
       <div className="section">
         <div className="section-head">
-          <div className="label">\u00a7 VI \u00b7 Diversity</div>
+          <div className="label">§ VI · Diversity</div>
           <div className="rule" />
-          <div className="aside">Top-10 share \u00b7 144 years</div>
+          <div className="aside">Top-10 share · 144 years</div>
         </div>
         <div className="twocol">
           <div>
             <DiversityChart width={620} height={220} />
             <p style={{fontFamily:"var(--mono)", fontSize:"10px", color:"var(--muted)", letterSpacing:"0.08em", marginTop:6}}>
-              Top-10 names as % of all births \u00b7 1880\u20132024
+              Top-10 names as % of all births · 1880–2024
             </p>
           </div>
           <aside style={{fontFamily:"var(--serif)", fontSize:"15px", lineHeight:1.55, color:"var(--vellum-dim)"}}>
             <p>
-              In 1947 the top ten names \u2014 Linda, Mary, Patricia, Barbara, Susan,
-              Nancy, Deborah, Sandra, Carol, Kathleen \u2014 accounted for nearly a third
+              In 1947 the top ten names — Linda, Mary, Patricia, Barbara, Susan,
+              Nancy, Deborah, Sandra, Carol, Kathleen — accounted for nearly a third
               of all American babies.
             </p>
             <p>
