@@ -7,12 +7,12 @@ const _ERAS_C = window.NAMES_DATA.ERAS;
 const _DIVERSITY = window.NAMES_DATA.DIVERSITY;
 const _NAME_INDEX = window.NAMES_DATA.NAME_INDEX;
 const ERA_COLOR = Object.fromEntries(_ERAS_C.map(e => [e.id, e.color]));
-ERA_COLOR.flash = "#a14545";
-ERA_COLOR.killed = "#6f5a4a";
-ERA_COLOR.steady = "#c4bda9";
+ERA_COLOR.flash = "#C4897A";
+ERA_COLOR.killed = "#9BA5AF";
+ERA_COLOR.steady = "#D5CFC3";
 
 // === Sparkline =========================================================
-function Sparkline({ data, width = 180, height = 28, color = "#d4a64a", peak = true, fill = false, baselineYear, peakLabel = false }) {
+function Sparkline({ data, width = 180, height = 28, color = "#1B2A4A", peak = true, fill = false, baselineYear, peakLabel = false }) {
   if (!data || !data.length) return null;
   const max = Math.max(...data.map(d => d.rate));
   if (max === 0) return <svg width={width} height={height} />;
@@ -27,7 +27,7 @@ function Sparkline({ data, width = 180, height = 28, color = "#d4a64a", peak = t
       {peak && <circle cx={xs(peakIdx)} cy={ys(data[peakIdx].rate)} r="2" fill={color} />}
       {peakLabel && (
         <text x={xs(peakIdx)} y={ys(data[peakIdx].rate) - 5} textAnchor="middle"
-              fill={color} fontFamily="IBM Plex Mono" fontSize="9">
+              fill={color} fontFamily="Space Mono" fontSize="9">
           {data[peakIdx].year}
         </text>
       )}
@@ -36,7 +36,7 @@ function Sparkline({ data, width = 180, height = 28, color = "#d4a64a", peak = t
 }
 
 // === Inline mini wave (for stat cards) ================================
-function MiniLine({ values, width = 180, height = 28, color = "#d4a64a", invert = false }) {
+function MiniLine({ values, width = 180, height = 28, color = "#1B2A4A", invert = false }) {
   const max = Math.max(...values);
   const min = Math.min(...values);
   const range = max - min || 1;
@@ -149,9 +149,9 @@ function Landscape({ width = 940, height = 360, selectedEra = null, onHover, hov
         return (
           <g>
             <line x1={xs(yi)} x2={xs(yi)} y1={top} y2={top + innerH}
-                  stroke="#e8e0cf" strokeOpacity="0.4" strokeWidth="1" />
+                  stroke="#1B2A4A" strokeOpacity="0.3" strokeWidth="1" />
             <text x={xs(yi)} y={top - 4} textAnchor="middle"
-                  fill="#d4a64a" fontFamily="IBM Plex Mono" fontSize="10" letterSpacing="0.08em">
+                  fill="#1B2A4A" fontFamily="Space Mono" fontSize="10" letterSpacing="0.08em">
               {hoverYear}
             </text>
           </g>
@@ -161,14 +161,14 @@ function Landscape({ width = 940, height = 360, selectedEra = null, onHover, hov
       {/* Name labels at peaks */}
       {labels.map(l => (
         <text key={l.name} x={l.x} y={l.y + 4} textAnchor="middle"
-              fill="#13110d" fontFamily="EB Garamond" fontSize="12.5"
-              fontStyle="italic" stroke="#13110d" strokeWidth="2" paintOrder="stroke">
-          <tspan fill="#13110d">{l.name}</tspan>
+              fill="#F5F0E8" fontFamily="Libre Baskerville" fontSize="12.5"
+              fontStyle="italic" stroke="#F5F0E8" strokeWidth="2" paintOrder="stroke">
+          <tspan fill="#F5F0E8">{l.name}</tspan>
         </text>
       ))}
       {labels.map(l => (
         <text key={l.name + "-2"} x={l.x} y={l.y + 4} textAnchor="middle"
-              fill="#13110d" fontFamily="EB Garamond" fontSize="12.5" fontStyle="italic">
+              fill="#F5F0E8" fontFamily="Libre Baskerville" fontSize="12.5" fontStyle="italic">
           {l.name}
         </text>
       ))}
@@ -177,7 +177,7 @@ function Landscape({ width = 940, height = 360, selectedEra = null, onHover, hov
 }
 
 // === Full wave chart for a single name with annotations ================
-function WaveChart({ name, width = 920, height = 280, annotations = [], color = "#d4a64a" }) {
+function WaveChart({ name, width = 920, height = 280, annotations = [], color = "#1B2A4A" }) {
   const n = _NAME_INDEX[name.toLowerCase()];
   if (!n) return null;
   const data = n.yearly;
@@ -217,7 +217,7 @@ function WaveChart({ name, width = 920, height = 280, annotations = [], color = 
       <circle cx={xs(peakIdx)} cy={ys(data[peakIdx].rate)} r="3" fill={color} />
       <text x={xs(peakIdx)} y={ys(data[peakIdx].rate) - 9}
             textAnchor="middle" fill={color}
-            fontFamily="IBM Plex Mono" fontSize="10" letterSpacing="0.08em">
+            fontFamily="Space Mono" fontSize="10" letterSpacing="0.08em">
         peak · {data[peakIdx].year}
       </text>
 
@@ -241,7 +241,7 @@ function WaveChart({ name, width = 920, height = 280, annotations = [], color = 
         return (
           <g key={i}>
             <line x1={x} y1={y - 4} x2={x} y2={ly + (a.up ? 6 : -10)} className="note-line" />
-            <circle cx={x} cy={y} r="2.5" fill="#e8e0cf" />
+            <circle cx={x} cy={y} r="2.5" fill="#1B2A4A" />
             <text x={x + 5} y={ly} className="note-text">{a.label}</text>
           </g>
         );
@@ -269,14 +269,14 @@ function Heatmap({ names, onSelect, selected, decadeWidth = 56 }) {
 
   function color(v) {
     const t = Math.min(1, v / maxRate);
-    if (t < 0.02) return "#1a1812";
-    // amber gradient
+    if (t < 0.02) return "#EDE8DE";
+    // parchment → ink blue gradient
     const lerp = (a, b, k) => Math.round(a + (b - a) * k);
     const stops = [
-      [33, 29, 20],
-      [107, 74, 26],
-      [212, 166, 74],
-      [246, 220, 156]
+      [237, 232, 222],  // panel parchment
+      [201, 168, 122],  // warm tan
+      [27, 42, 74],     // ink blue
+      [13, 24, 41]      // deep ink
     ];
     const idx = Math.min(stops.length - 2, Math.floor(t * (stops.length - 1)));
     const k = t * (stops.length - 1) - idx;
@@ -330,17 +330,17 @@ function DiversityChart({ width = 460, height = 160 }) {
       ))}
       <text x={left - 6} y={top + 8} textAnchor="end" className="axis-text">top 10</text>
       <path d={`${path10} L${xs(data.length - 1)},${ys10(0)} L${xs(0)},${ys10(0)} Z`}
-            fill="#d4a64a" opacity="0.14" />
-      <path d={path10} fill="none" stroke="#d4a64a" strokeWidth="1.5" />
+            fill="#1B2A4A" opacity="0.12" />
+      <path d={path10} fill="none" stroke="#1B2A4A" strokeWidth="1.5" />
       {/* peak label */}
       {(() => {
         const pi = data.reduce((b, d, i) => d.top10Share > data[b].top10Share ? i : b, 0);
         return (
           <g>
-            <circle cx={xs(pi)} cy={ys10(data[pi].top10Share)} r="2.5" fill="#d4a64a" />
+            <circle cx={xs(pi)} cy={ys10(data[pi].top10Share)} r="2.5" fill="#1B2A4A" />
             <text x={xs(pi)} y={ys10(data[pi].top10Share) - 8}
-                  textAnchor="middle" fill="#d4a64a"
-                  fontFamily="IBM Plex Mono" fontSize="9.5">
+                  textAnchor="middle" fill="#1B2A4A"
+                  fontFamily="Space Mono" fontSize="9.5">
               {data[pi].year} · {(data[pi].top10Share*100).toFixed(0)}%
             </text>
           </g>
@@ -356,7 +356,7 @@ function DiversityChart({ width = 460, height = 160 }) {
 }
 
 // === Suffix small multiples ===========================================
-function SuffixPanel({ suffix, peak, label, color = "#d4a64a" }) {
+function SuffixPanel({ suffix, peak, label, color = "#1B2A4A" }) {
   // Generate a synthetic suffix curve
   const data = _YEARS.map(y => {
     const d = y - peak;
