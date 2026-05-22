@@ -1,0 +1,7 @@
+pipeline/data/raw/
+pipeline/data/clean/
+pipeline/output/*.json
+__pycache__/
+*.pyc
+.venv/
+.DS_Store

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>One Hundred Years · American Names</title>
+
+<meta name="description" content="144 years of American baby names analyzed as cultural waves. Interactive dashboard exploring naming eras, archetypes, gender crossovers, and cultural triggers.">
+<meta property="og:title" content="One Hundred Years of American Names">
+<meta property="og:description" content="Every name is a cultural wave. Explore 104,000 names across 144 years of American history.">
+<meta property="og:url" content="https://onehundredyears.report/names">
+
+<link rel="stylesheet" href="styles.css" />
+<style id="grain-style">body::before { opacity: 1; }</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<script src="src/data.js"></script>
+<script type="text/babel" src="src/tweaks-panel.jsx"></script>
+<script type="text/babel" src="src/charts.jsx"></script>
+<script type="text/babel" src="src/tabs.jsx"></script>
+<script type="text/babel" src="src/app.jsx"></script>
+</body>
+</html>
