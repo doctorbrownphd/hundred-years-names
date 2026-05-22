@@ -160,6 +160,34 @@ function TabSearch({ accent }) {
       .slice(0, 5);
   }, [found]);
 
+  // Your Life in Names — top names at different life-stage offsets
+  const lifeStages = React.useMemo(() => {
+    if (!found) return [];
+    const birthYear = found.peakYear;
+    const isFemale = found.gender === "F";
+    const sameGender = (n) => n.gender === found.gender;
+    const oppGender = (n) => n.gender !== found.gender;
+    const topAt = (year, filter, count=3) =>
+      _ND.filter(n => n.name !== found.name && filter(n) && Math.abs(n.peakYear - year) <= 2)
+          .sort((a,b) => b.peakRate - a.peakRate)
+          .slice(0, count)
+          .map(n => n.name);
+    const stages = [];
+    // Best friend (age 6-10, same gender)
+    stages.push({ age:"Age 6", label:"Your best friend was probably", names: topAt(birthYear, sameGender), note: `elementary school, ~${birthYear + 6}` });
+    // First crush (age 12-14, opposite gender)
+    stages.push({ age:"Age 13", label: isFemale ? "Your first crush was likely a" : "Your first crush was likely a", names: topAt(birthYear, oppGender), note:`middle school, ~${birthYear + 13}` });
+    // Teacher (born ~25 years before you)
+    stages.push({ age:"Your teacher", label:"Was probably named", names: topAt(birthYear - 25, (n) => n.gender === "F"), note:`born ~${birthYear - 25}` });
+    // Your kids (when you were ~30)
+    if (birthYear + 30 <= 2024) {
+      stages.push({ age:"Your kids", label:"If you followed the trend, are named", names: topAt(birthYear + 30, sameGender), note:`born ~${birthYear + 30}` });
+    }
+    // Boss at first job (born ~20 years before you)
+    stages.push({ age:"Your first boss", label:"Was probably named", names: topAt(birthYear - 20, (n) => n.gender === "M"), note:`born ~${birthYear - 20}` });
+    return stages.filter(s => s.names.length > 0);
+  }, [found]);
+
   const stronghold = React.useMemo(() => {
     if (!found) return null;
     const map = {
@@ -313,6 +341,43 @@ function TabSearch({ accent }) {
                       >
                         {g.name} <span style={{fontFamily:"var(--mono)", fontSize:10, color:"var(--muted)", marginLeft:4}}>peak {g.peakYear}</span>
                       </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Your Life in Names */}
+              {lifeStages.length > 0 && (
+                <div style={{marginTop:28, padding:"24px 24px 20px", background:"var(--panel)", borderRadius:6, border:"1px solid var(--rule)"}}>
+                  <div style={{fontFamily:"var(--mono)", fontSize:10, letterSpacing:"0.16em", textTransform:"uppercase", color:"var(--muted)", marginBottom:6}}>
+                    Your Life in Names
+                  </div>
+                  <div style={{fontFamily:"var(--serif)", fontStyle:"italic", fontSize:14, color:"var(--vellum-dim)", marginBottom:18, lineHeight:1.5}}>
+                    If your name is {found.name}, you were most likely born around {found.peakYear}. Here's who surrounded you:
+                  </div>
+                  <div style={{display:"flex", flexDirection:"column", gap:0}}>
+                    {lifeStages.map((s, i) => (
+                      <div key={i} style={{
+                        display:"grid", gridTemplateColumns:"90px 1fr",
+                        padding:"10px 0",
+                        borderBottom: i < lifeStages.length - 1 ? "1px solid var(--rule)" : "none",
+                        alignItems:"baseline",
+                      }}>
+                        <div style={{fontFamily:"var(--mono)", fontSize:11, fontWeight:700, color:"var(--ink)", letterSpacing:"0.04em"}}>
+                          {s.age}
+                        </div>
+                        <div>
+                          <span style={{fontFamily:"var(--serif)", fontSize:14, color:"var(--vellum-dim)"}}>
+                            {s.label}{" "}
+                          </span>
+                          <span style={{fontFamily:"var(--display)", fontSize:18, fontWeight:600, color:"var(--ink)", letterSpacing:"-0.01em"}}>
+                            {s.names.join(", ")}
+                          </span>
+                          <span style={{fontFamily:"var(--mono)", fontSize:9, color:"var(--muted)", marginLeft:8}}>
+                            {s.note}
+                          </span>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
