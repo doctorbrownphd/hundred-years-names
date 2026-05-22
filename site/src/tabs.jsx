@@ -422,7 +422,7 @@ function TabGeo({ accent }) {
   ];
 
   const W = 560, H = 28 * states.length + 40;
-  const padL = 70, padR = 200, padT = 24, padB = 16;
+  const padL = 70, padR = 10, padT = 24, padB = 16;
   const innerW = W - padL - padR;
   const min = -6, max = 6;
   const xs = (v) => padL + ((v - min) / (max - min)) * innerW;
@@ -475,14 +475,9 @@ function TabGeo({ accent }) {
                     <text x={isLead ? barX - 6 : barX + barW + 6}
                           y={rowY(i) + 4}
                           textAnchor={isLead ? "end" : "start"}
-                          fontFamily="Space Mono" fontSize="10.5"
-                          fill="var(--vellum-dim)" letterSpacing="0.02em">
-                      {isLead ? `${s.lead.toFixed(1)}` : `+${s.lead.toFixed(1)}`} yr
-                    </text>
-                    <text x={W - padR + 10} y={rowY(i) + 4}
-                          fontFamily="Libre Baskerville" fontSize="13" fontStyle="italic"
-                          fill="var(--muted)">
-                      {s.top.slice(0,2).join(", ")}
+                          fontFamily="Space Mono" fontSize="10"
+                          fill="var(--vellum-dim)">
+                      {isLead ? `${s.lead.toFixed(1)} yr` : `+${s.lead.toFixed(1)} yr`}
                     </text>
                   </g>
                 );
