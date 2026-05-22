@@ -82,7 +82,7 @@ function LeadLagMap({ states, onHover }) {
   if (!paths) return <div style={{height:300, display:"flex", alignItems:"center", justifyContent:"center", color:"var(--muted)"}}>Loading map…</div>;
 
   return (
-    <svg viewBox="-70 80 990 540" preserveAspectRatio="xMidYMid meet" style={{width:"100%", height:"auto", maxHeight:400, display:"block"}}>
+    <svg viewBox="-70 60 1020 580" preserveAspectRatio="xMidYMid meet" style={{width:"100%", height:"auto", maxHeight:420, display:"block", margin:"0 auto"}}>
       {Object.entries(paths).map(([st, d]) => {
         const s = byState[st];
         const lead = s ? s.lead : 0;
@@ -718,6 +718,7 @@ function TabGeo({ accent }) {
 // TAB 05 · THE COLLISION (Archetypes)
 // ====================================================================
 function TabArchetypes({ accent }) {
+  const [expanded, setExpanded] = React.useState(null);
   const archetypes = [
     { id:"jennifers", label:"The Jennifers",   n: 1240, color:"var(--era-suburban)",
       top:["Jennifer","Jessica","Amy","Heather","Melissa"],
@@ -758,26 +759,67 @@ function TabArchetypes({ accent }) {
           {archetypes.map((a, i) => {
             const sample = _NI[a.top[0].toLowerCase()] || _NI[a.top[0].toLowerCase()+"_F"] || _NI[a.top[0].toLowerCase()+"_M"] || _ND[0];
             const col = i % 3, row = Math.floor(i / 3);
+            const isExpanded = expanded === a.id;
+            // Gather all member names with data
+            const members = a.top.map(nm => {
+              const q = nm.toLowerCase();
+              return _NI[q] || _NI[q+"_F"] || _NI[q+"_M"];
+            }).filter(Boolean);
             return (
               <div key={a.id} style={{
                 padding:"22px 24px 26px",
                 borderRight: col < 2 ? "1px solid var(--rule)" : "none",
                 borderBottom: row === 0 ? "1px solid var(--rule)" : "none",
-              }}>
+                cursor:"pointer",
+                background: isExpanded ? "rgba(27,42,74,0.03)" : "transparent",
+                transition:"background 200ms",
+                gridColumn: isExpanded ? "1 / -1" : undefined,
+              }} onClick={() => setExpanded(isExpanded ? null : a.id)}>
                 <div style={{display:"flex", alignItems:"baseline", gap:10, marginBottom:8}}>
                   <div style={{width:10, height:10, borderRadius:3, background:a.color}} />
                   <div style={{fontFamily:"var(--mono)", fontSize:"10px", letterSpacing:"0.16em", color:"var(--muted)", textTransform:"uppercase"}}>
                     n = {a.n.toLocaleString()}
                   </div>
+                  <span style={{marginLeft:"auto", fontFamily:"var(--mono)", fontSize:10, color:"var(--muted)"}}>
+                    {isExpanded ? "▾ collapse" : "▸ expand"}
+                  </span>
                 </div>
                 <div style={{fontFamily:"var(--display)", fontSize:"26px", fontWeight:600, marginBottom:6, letterSpacing:"-0.01em", color:"var(--ink)"}}>{a.label}</div>
                 <div style={{fontFamily:"var(--serif)", fontStyle:"italic", fontSize:"14px", color:"var(--vellum-dim)", lineHeight:1.5, marginBottom:14}}>
                   {a.desc}
                 </div>
-                <Sparkline data={sample.yearly} width={220} height={36} color={accent} fill />
-                <div style={{fontFamily:"var(--serif)", fontStyle:"italic", fontSize:"13.5px", color:"var(--muted)", marginTop:10}}>
-                  {a.top.join(" · ")}
-                </div>
+                {!isExpanded && (
+                  <>
+                    <Sparkline data={sample.yearly} width={220} height={36} color={accent} fill />
+                    <div style={{fontFamily:"var(--serif)", fontStyle:"italic", fontSize:"13.5px", color:"var(--muted)", marginTop:10}}>
+                      {a.top.join(" · ")}
+                    </div>
+                  </>
+                )}
+                {isExpanded && (
+                  <div style={{marginTop:8}} onClick={e => e.stopPropagation()}>
+                    <div style={{display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:12}}>
+                      {members.map(n => (
+                        <div key={n.name} style={{
+                          background:"var(--bg)", border:"1px solid var(--rule)", borderRadius:6,
+                          padding:"14px 12px", textAlign:"center",
+                        }}>
+                          <div style={{fontFamily:"var(--display)", fontSize:20, fontWeight:600, color:"var(--ink)", marginBottom:2}}>{n.name}</div>
+                          <div style={{fontFamily:"var(--mono)", fontSize:9, color:"var(--muted)", letterSpacing:"0.1em", marginBottom:8}}>
+                            PEAK {n.peakYear} · {(n.peakRate||0).toFixed(1)}/1k
+                          </div>
+                          <Sparkline data={n.yearly} width={120} height={32} color={accent} fill />
+                          <div style={{fontFamily:"var(--mono)", fontSize:9, color:"var(--muted)", marginTop:6}}>
+                            half-life {n.halfLife || "—"} yr
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{fontFamily:"var(--serif)", fontStyle:"italic", fontSize:13, color:"var(--muted)", marginTop:14}}>
+                      {a.desc} Click a name above to explore its full wave.
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
