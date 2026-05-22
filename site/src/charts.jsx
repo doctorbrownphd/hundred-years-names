@@ -186,7 +186,8 @@ function Landscape({ width = 940, height = 360, selectedEra = null, onHover, hov
 // === Full wave chart for a single name with annotations ================
 function WaveChart({ name, width = 920, height = 280, annotations = [], color = "#1B2A4A" }) {
   const q = name.toLowerCase();
-  const n = _NAME_INDEX[q] || _NAME_INDEX[q + "_F"] || _NAME_INDEX[q + "_M"];
+  const _wf = _NAME_INDEX[q + "_F"], _wm = _NAME_INDEX[q + "_M"];
+  const n = _NAME_INDEX[q] || (_wf && _wm ? ((_wf.peakRate||0) >= (_wm.peakRate||0) ? _wf : _wm) : (_wf || _wm));
   if (!n) return null;
   const data = n.yearly;
   const max = Math.max(...data.map(d => d.rate)) * 1.12 || 1;

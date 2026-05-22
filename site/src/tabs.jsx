@@ -114,8 +114,10 @@ function TabSearch({ accent }) {
   const found = React.useMemo(() => {
     if (!query.trim()) return null;
     const q = query.trim().toLowerCase();
-    // Try exact match, then with _f, then with _m (prefer the more common gender)
-    return _NI[q] || _NI[q + "_F"] || _NI[q + "_M"] || null;
+    if (_NI[q]) return _NI[q];
+    const f = _NI[q + "_F"], m = _NI[q + "_M"];
+    if (f && m) return (f.peakRate || 0) >= (m.peakRate || 0) ? f : m;
+    return f || m || null;
   }, [query]);
 
   const annotations = React.useMemo(() => {
@@ -257,7 +259,9 @@ function TabSearch({ accent }) {
           </div>
           <div className="yourname-cards">
             {featuredNames.map(nm => {
-              const q = nm.toLowerCase(); const n = _NI[q] || _NI[q+"_F"] || _NI[q+"_M"];
+              const q = nm.toLowerCase();
+              const _f = _NI[q+"_F"], _m = _NI[q+"_M"];
+              const n = _NI[q] || (_f && _m ? ((_f.peakRate||0) >= (_m.peakRate||0) ? _f : _m) : (_f || _m));
               if (!n) return null;
               return (
                 <div key={nm} className="yourname-card" onClick={() => setQuery(nm)}>
@@ -326,7 +330,7 @@ function TabSearch({ accent }) {
                 </div>
                 <div className="nrs-item">
                   <div className="nrs-label">Curve type</div>
-                  <div className="nrs-value" style={{fontSize:16, fontFamily:"var(--serif)"}}>{found.curveType === "flash" ? "Flash" : found.curveType === "steady" ? "Steady" : found.curveType === "revival" ? "Revival" : "Wave"}</div>
+                  <div className="nrs-value" style={{fontSize:16, fontFamily:"var(--serif)"}}>{found.curveType === "flash" ? "Flash" : found.curveType === "steady" ? "Steady" : found.curveType === "revival" ? "Revival" : found.curveType === "crossover" ? "Crossover" : "Wave"}</div>
                 </div>
                 <div className="nrs-item">
                   <div className="nrs-label">Era</div>
@@ -495,7 +499,10 @@ function TabWaves({ accent }) {
 
         <div className="waves-list">
           {_WAVES.map(w => {
-            const samples = w.names.map(nm => _NI[nm.toLowerCase()] || _NI[nm.toLowerCase()+"_F"] || _NI[nm.toLowerCase()+"_M"]).filter(Boolean);
+            const samples = w.names.map(nm => {
+              const q = nm.toLowerCase(), f = _NI[q+"_F"], m = _NI[q+"_M"];
+              return _NI[q] || (f && m ? ((f.peakRate||0) >= (m.peakRate||0) ? f : m) : (f || m));
+            }).filter(Boolean);
             return (
               <div className="wave-card" key={w.id}>
                 <div className="yr">
@@ -588,7 +595,8 @@ function TabEra({ accent }) {
     .slice(0, 60);
 
   const _q = selected.toLowerCase();
-  const sel = _NI[_q] || _NI[_q+"_F"] || _NI[_q+"_M"];
+  const _sf = _NI[_q+"_F"], _sm = _NI[_q+"_M"];
+  const sel = _NI[_q] || (_sf && _sm ? ((_sf.peakRate||0) >= (_sm.peakRate||0) ? _sf : _sm) : (_sf || _sm));
 
   return (
     <div>
@@ -665,6 +673,7 @@ function curveTypeLabel(n) {
   if (n.curveType === "flash") return "A flash. Owes its existence to a single cultural moment.";
   if (n.curveType === "steady") return "A steady. Never peaks, never disappears.";
   if (n.curveType === "revival") return "A revival. Two peaks, a century apart.";
+  if (n.curveType === "crossover") return `A crossover. Used across genders, with a dominant side (half-life ${n.halfLife || "—"} yr).`;
   if (!n.halfLife) return "Still rising. The curve is incomplete.";
   return `A classic wave. Right-skewed: fast rise, slow decay (half-life ${n.halfLife} yr).`;
 }
@@ -895,13 +904,14 @@ function TabArchetypes({ accent }) {
 
         <div style={{display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:0, background:"var(--panel)", borderRadius:6, boxShadow:"0 1px 4px rgba(27,42,74,0.06), 0 0 0 1px rgba(213,207,195,0.5)"}}>
           {archetypes.map((a, i) => {
-            const sample = _NI[a.top[0].toLowerCase()] || _NI[a.top[0].toLowerCase()+"_F"] || _NI[a.top[0].toLowerCase()+"_M"] || _ND[0];
+            const _aq = a.top[0].toLowerCase(), _af = _NI[_aq+"_F"], _am = _NI[_aq+"_M"];
+            const sample = _NI[_aq] || (_af && _am ? ((_af.peakRate||0) >= (_am.peakRate||0) ? _af : _am) : (_af || _am)) || _ND[0];
             const col = i % 3, row = Math.floor(i / 3);
             const isExpanded = expanded === a.id;
             // Gather all member names with data
             const members = a.top.map(nm => {
-              const q = nm.toLowerCase();
-              return _NI[q] || _NI[q+"_F"] || _NI[q+"_M"];
+              const q = nm.toLowerCase(), f = _NI[q+"_F"], m = _NI[q+"_M"];
+              return _NI[q] || (f && m ? ((f.peakRate||0) >= (m.peakRate||0) ? f : m) : (f || m));
             }).filter(Boolean);
             return (
               <div key={a.id} style={{
@@ -1300,7 +1310,8 @@ function TabOverview({ accent }) {
             { tag: "The Trigger",   name: "Khaleesi",  by: "first recorded in 2011 · Game of Thrones",
               nums: [["debut","2011"],["peak","2013"],["born","∼560"]] },
           ].map((f, i) => {
-            const n = _NI[f.name.toLowerCase()] || _NI[f.name.toLowerCase()+"_F"] || _NI[f.name.toLowerCase()+"_M"];
+            const _fq = f.name.toLowerCase(), _ff = _NI[_fq+"_F"], _fm = _NI[_fq+"_M"];
+            const n = _NI[_fq] || (_ff && _fm ? ((_ff.peakRate||0) >= (_fm.peakRate||0) ? _ff : _fm) : (_ff || _fm));
             return (
               <div className="feat" key={i}>
                 <div className="tag">{f.tag}</div>
@@ -1371,11 +1382,10 @@ function TabOverview({ accent }) {
 }
 
 function eraLabel(id) {
-  if (!id) return "Unclassified";
+  if (!id || id === "Unclassified") return "Unclassified";
   const e = _ERAS.find(x => x.id === id);
   if (e) return e.label;
-  // Map data-format era labels to display names
-  const map = { "Era 0": "Classic", "Era 1": "Suburban", "Era 2": "Modern", "Unclassified": "Unclassified" };
+  const map = { "Era 0": "Classic", "Era 1": "Suburban", "Era 2": "Modern" };
   return map[id] || id;
 }
 

@@ -64,7 +64,7 @@ function SplashScreen({ onDismiss }) {
         fontFamily: "'Libre Baskerville', Georgia, serif",
         fontSize: 15, color: "rgba(27,42,74,0.45)", textAlign: "center",
         maxWidth: 520, lineHeight: 1.6, marginTop: 16,
-      }}>A name is a cultural artifact. This is 145 years of evidence.</div>
+      }}>A name is a cultural artifact. This is 144 years of evidence.</div>
 
       <div className="splash-enter" style={{
         fontFamily: "'Space Mono', monospace",

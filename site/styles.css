@@ -131,7 +131,11 @@ a:hover { color: var(--highlight); border-bottom-color: var(--highlight); }
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+.tabs::-webkit-scrollbar { display: none; }
 .tab {
   padding: 12px 18px 14px;
   color: var(--muted);
