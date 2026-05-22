@@ -421,8 +421,8 @@ function TabGeo({ accent }) {
     { abbr:"WV", name:"West Virginia",lead:  5.2, top:["Oliver","Liam","Wyatt"] },
   ];
 
-  const W = 560, H = 28 * states.length + 40;
-  const padL = 70, padR = 10, padT = 24, padB = 16;
+  const W = 620, H = 28 * states.length + 40;
+  const padL = 120, padR = 10, padT = 24, padB = 16;
   const innerW = W - padL - padR;
   const min = -6, max = 6;
   const xs = (v) => padL + ((v - min) / (max - min)) * innerW;
