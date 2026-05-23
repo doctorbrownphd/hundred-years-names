@@ -306,6 +306,9 @@ The pipeline and dashboard were built by a small team. The analysis was computed
 
 ---
 
-*One Hundred Years of American Names as a Cultural Signal*
-Issue 02 — One Hundred Years
+*Report 02 of 10 in the One Hundred Years series.*
 [names.onehundredyears.report](https://names.onehundredyears.report)
+
+**Contact:** hello@onehundredyears.report
+**License:** MIT
+**Repository:** github.com/doctorbrownphd/hundred-years-names
