@@ -162,14 +162,15 @@ function App() {
               <line x1="0" y1="72" x2="12" y2="72" stroke="var(--ink)" strokeWidth="1.5"/>
             </svg>
           </a>
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.35, flexShrink: 0, marginTop: 14 }}>
-            <path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/>
-          </svg>
           <div>
             <div className="series" style={{ fontFamily: "'Cormorant Garamond', var(--display, Georgia)", fontWeight: 600, letterSpacing: "0.25em", fontSize: 10 }}>
               <span>One Hundred Years of</span>
             </div>
-            <h1><em>American Names.</em></h1>
+            <h1 style={{ display: "flex", alignItems: "center", gap: 16 }}><em>American Names.</em>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.25, flexShrink: 0 }}>
+                <path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/>
+              </svg>
+            </h1>
             <div className="sub">
               144 years of birth certificates, read as a cultural record.
               Every name a wave, every wave a generation.
